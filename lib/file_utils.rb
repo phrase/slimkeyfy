@@ -20,18 +20,14 @@ class FileReader
 end
 
 class FileWriter
-  def self.rename_to_bak(file)
-    fname = file_basename(file).split(".")
-    File.rename(file, "#{File.dirname(file)}/#{fname}.bak")
+  def self.overwrite(full_path, content="")
+    self.write(full_path, content)
   end
-  def self.overwrite(path, content="")
-    self.write(path, content)
+  def self.write(full_path, content)
+    File.open(full_path, "w") { |f| f.write(content) }
   end
-  def self.write(path, content)
-    open(File.expand_path(path), "w") { |f| f.write(content) }
-  end
-  def self.append(path, content)
-    open(path, 'a') { |f| f.puts content}
+  def self.append(full_path, content)
+    open(full_path, 'a') { |f| f.puts content}
   end
   def self.create_temporary_file(file)
     "#{File.dirname(file)}/translated_#{file_basename(file)}.html.slim"

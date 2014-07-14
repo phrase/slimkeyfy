@@ -4,10 +4,8 @@ require './parser'
 
 class TranslateSlim
 
-  def initialize(file, output=nil, diff_mode)
-    @tempfile = create_tempfile(output, file)
-    @file = FileUtils.abs_path(file)
-    @content = FileReader.read(@file).split("\n")
+  def initialize(file, output=nil, diff_mode=false)
+    @bak_path, @file_path, @content = create_backup(file)
     @key_base = translation_key_base
     @new_content = []
   end
@@ -17,9 +15,7 @@ class TranslateSlim
   end
 
   def stream_mode
-    FileWriter.rename_to_bak(@file)
-    FileWriter.overwrite(@tempfile)
-
+    puts "content=#{@content}"
     @content.each_with_index do |old_line, idx|
 
       word = Word.new(old_line, idx, @key_base)
@@ -37,7 +33,7 @@ class TranslateSlim
 
       else update_with(idx, old_line) end
 
-      FileWriter.append(@tempfile, @new_content[idx])
+      FileWriter.append(@file_path, @new_content[idx])
 
     end
   end
@@ -58,17 +54,18 @@ class TranslateSlim
   end
 
   def translation_key_base
-    dirname = FileWriter.subdir_name(@file)
-    fname = FileWriter.file_basename(@file)
+    dirname = FileWriter.subdir_name(@file_path)
+    fname = FileWriter.file_basename(@file_path)
     "#{dirname}.#{fname}"
   end
 
-  def create_tempfile(output, file)
-    if (output.nil? or not File.file?(output)) then
-      file
-    else
-      FileUtils.abs_path(output) 
-    end
+  def create_backup(file)
+    original_file_path = FileUtils.abs_path(file)
+    content = FileReader.read(original_file_path)
+    bak_path = "#{original_file_path}.bak"
+    File.open(bak_path, "w"){|f| f.write(content)}
+    FileWriter.overwrite(original_file_path)
+    [bak_path, original_file_path, content.split("\n")]
   end
 end
 
