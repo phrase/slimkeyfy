@@ -5,7 +5,7 @@ class Matcher
     /(?![-])=\s+([a-z]+[0-9]?[\._]?[a-z]+)/ # match all lines with a slim ruby tag
   ]
   def self.match(word)
-    LEXEMS.select{|regex| word.match(regex)}
+    LEXEMS.select{|regex| word.match(regex) }
   end
 end
 
@@ -25,7 +25,7 @@ class Transformer
 
     result = case tokens[0]
       when HTML_TAGS then
-        normalize_parted_translations(tokens[0].gsub("|", "="), @word.slice(1, -1))
+        normalize_parted_translations(tokens[0], @word.slice(1, -1))
       else nil end
 
     if result.nil? then
@@ -88,6 +88,7 @@ class Transformer
 
   def normalize_parted_translations(before_translation, translation, after_translation="")
     translation, translation_key = @word.update_translation_key_hash(translation)
+    before_translation.gsub("|", "=").gsub(HTML_TAGS, "$1=")
     ["#{@word.indentation}#{before_translation} #{translation_key} #{after_translation}", @word.translations]
   end
 end
