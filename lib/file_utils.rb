@@ -1,6 +1,38 @@
 require 'find'
 
 class FileUtils
+  def self.create_backup(options)
+    original_file_path = FileUtils.abs_path(options[:input])
+    content = FileReader.read(original_file_path)
+    bak_path = "#{original_file_path}.bak"
+    File.open(bak_path, "w"){|f| f.write(content)}
+    validate_content!(bak_path, content)
+    [bak_path, content.split("\n")]
+  end
+
+  def self.create_new_file(options)
+    new_file_path = build_new_file_path(options)
+    FileWriter.overwrite(new_file_path)
+    new_file_path
+  end
+
+  def self.build_new_file_path(options)
+    out = options[:output]
+    if out and File.file?(out) then
+      FileUtils.abs_path(out)
+    else
+      FileUtils.abs_path(options[:input])
+    end
+  end
+
+  def self.validate_content!(bak_path, orig_content)
+    backed_content = FileReader.read(bak_path)
+    if backed_content != orig_content then
+      puts "Content in backup got corrupted! Please retry"
+      exit
+    end
+  end
+  
   def self.abs_path(file)
     File.absolute_path(file)
   end

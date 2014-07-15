@@ -13,7 +13,7 @@ class YamlWriter
   end
 
   def process_and_store!
-    process!
+    process
     store
   end
 
