@@ -6,6 +6,16 @@ class ConsolePrinter
     puts "#{'+'.green} #{normalize(new_line).green} => #{translations.to_s.yellow}"
     puts "-"*40
   end
+  def self.unix_diff(bak_path, file_path)
+    result = "Please install colordiff or diff (brew install colordiff)"
+    colordiff, diff = `which colordiff`, `which diff`
+    if not colordiff.empty? then
+      result = `colordiff #{bak_path} #{file_path}`
+    elsif not diff.empty? then
+      result =`diff #{bak_path} #{file_path}`
+    end
+    puts "#{result}"
+  end
   def self.normalize(line)
     line.sub(/^\s*/, " ")
   end
@@ -43,51 +53,49 @@ end
 
 
 class CommandLine
-  def initialize(args)
-    @usage = "Usage: translateSlim INPUT_FILENAME_OR_DIRECTORY [OUTPUT_FILENAME_OR_DIRECTORY] [Options]"
-    if args.size < 1 then
-      puts @usage
-      exit
-    end
-    @args = args
-    @opts = OptionParser.new(&method(:opt_scan))
+  def initialize
+    @options = {}
+    @opts = OptionParser.new(&method(:opt_scan)).parse!
   end
 
   def opt_scan(opts)
-    opts.banner = @usage
+    opts.banner = "Usage: translateSlim INPUT_FILENAME_OR_DIRECTORY [OUTPUT_FILENAME_OR_DIRECTORY] [Options]"
     opts.on_tail('-h', '--help', 'Show this message') do
       puts opts
       exit
     end
     opts.on_tail('-d', '--diff', 'Uses unix diff or colordiff for full file comparison') do
-      puts opts
-      exit
+      @options[:diff] = true
     end
   end
 
   def main
-    @opts.parse!(@args)
-    input = @args.shift
-    output = @args.shift
-    unix_diff_mode = false
+    @options[:input] = input = ARGV.shift
+    @options[:output] = output = ARGV.shift
 
     if File.directory?(input) then
       FileUtils.walk(input).each do |inp|
-        translate(intput, nil, unix_diff_mode)
+        translate
       end
     elsif File.file?(input) then
-      translate(input, output, unix_diff_mode)
+      translate
     else
       raise "Please provide a file or directory!"
       exit
     end
   end
 
-  def translate(input, output=nil, unix_diff_mode=false)
-    puts "file=#{input} diff=#{unix_diff_mode}"
-    TranslateSlim.new(input, output, unix_diff_mode).stream_mode
+  def translate
+    puts "file=#{@options[:input]} diff=#{@options[:diff]}"
+    translate_slim = TranslateSlim.new(@options)
+    if @options[:diff] then
+      translate_slim.unix_diff_mode
+    else
+      translate_slim.stream_mode
+    end
   end
 end
+
 
 
 
