@@ -147,12 +147,12 @@ class Word
 
   def match_string(translation)
     m = translation.match(/\"(.*)\"/)
-    m != nil ? $1 : ""
+    m != nil ? $1 : translation
   end
 end
 
 class TranslationKeyBuilder
-  SPECIAL_CHARS = /[:\-"'\(\)\|\}\{\]\[#\.,;]+/
+  SPECIAL_CHARS = /[:\-"'\(\)\|\}\{\]\[#\.,;!?]+/
 
   def initialize(key_base, translation)
     @key_base = key_base
