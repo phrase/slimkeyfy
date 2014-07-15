@@ -6,7 +6,8 @@ class TranslateSlim
 
   def initialize(options={})
     @options = options
-    @bak_path, @file_path, @content = create_backup(@options)
+    @bak_path, @content = create_backup(@options)
+    @file_path = create_new_file(@options)
     @key_base = translation_key_base
     @new_content = []
   end
@@ -85,9 +86,14 @@ class TranslateSlim
     content = FileReader.read(original_file_path)
     bak_path = "#{original_file_path}.bak"
     File.open(bak_path, "w"){|f| f.write(content)}
+    validate_content!(bak_path, content)
+    [bak_path, content.split("\n")]
+  end
+
+  def create_new_file(options)
     new_file_path = build_new_file_path(options)
     FileWriter.overwrite(new_file_path)
-    [bak_path, new_file_path, content.split("\n")]
+    new_file_path
   end
 
   def build_new_file_path(options)
@@ -96,6 +102,14 @@ class TranslateSlim
       FileUtils.abs_path(out)
     else
       FileUtils.abs_path(options[:input])
+    end
+  end
+
+  def validate_content!(bak_path, orig_content)
+    backed_content = FileReader.read(bak_path)
+    if backed_content != orig_content then
+      puts "Content in backup got corrupted! Please retry"
+      exit
     end
   end
 end
