@@ -25,7 +25,7 @@ class Transformer
 
     result = case tokens[0]
       when HTML_TAGS then
-        normalize_parted_translations(tokens[0], @word.slice(1, -1))
+        normalize_parted_translations(to_equals_tag(tokens[0]), @word.slice(1, -1))
       else nil end
 
     if result.nil? then
@@ -78,6 +78,16 @@ class Transformer
     "#{before} #{translated}"
   end
 
+  def to_equals_tag(s)
+    s = s.gsub("|", "=")
+    m = s.match(HTML_TAGS)
+    unless m.nil?
+      fst = m.captures.first
+      return "#{fst}=" if fst == s
+    end
+    s
+  end
+
   def match_string(translation)
     translation.match(/"(.*)"/) != nil
   end
@@ -88,19 +98,17 @@ class Transformer
 
   def normalize_parted_translations(before_translation, translation, after_translation="")
     translation, translation_key = @word.update_translation_key_hash(translation)
-    before_translation.gsub("|", "=").gsub(HTML_TAGS, "$1=")
     ["#{@word.indentation}#{before_translation} #{translation_key} #{after_translation}", @word.translations]
   end
 end
 
 
 class Word
-  attr_reader :line, :tokens, :line_no, :indentation
+  attr_reader :line, :tokens, :indentation
   attr_accessor :translations
 
-  def initialize(line, line_no, key_base)
+  def initialize(line, key_base)
     @line = escape(line)
-    @line_no = line_no
     @indentation = " " * (@line.size - unindented_line.size)
     @translations = {}
     @key_base = key_base
@@ -144,7 +152,7 @@ class Word
 end
 
 class TranslationKeyBuilder
-  SPECIAL_CHARS = /[:\-"'\(\)\|\}\{\]\[#]+/
+  SPECIAL_CHARS = /[:\-"'\(\)\|\}\{\]\[#\.,;]+/
 
   def initialize(key_base, translation)
     @key_base = key_base
