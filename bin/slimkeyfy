@@ -2,4 +2,4 @@
 
 require 'slimkeyfy'
 
-SlimKeyfy.start!
+SlimKeyfy.translate(ARGV)

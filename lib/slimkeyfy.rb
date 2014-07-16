@@ -74,11 +74,11 @@ class TranslateSlim
 end
 
 class SlimKeyfy
-  def self.translate!
-    CommandLine.new.main
+  def self.translate(args)
+    CommandLine.new(args).main
   end
 end
 
-# SlimKeyfy.translate!
+SlimKeyfy.translate(ARGV)
 
 

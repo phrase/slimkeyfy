@@ -53,10 +53,11 @@ end
 
 
 class CommandLine
-  def initialize
+  def initialize(args)
     helpful_exit if ARGV.size < 1
     @options = {}
-    @opts = OptionParser.new(&method(:opt_scan)).parse!
+    @args = args
+    OptionParser.new(&method(:opt_scan)).parse!(@args)
   end
 
   def helpful_exit
@@ -76,8 +77,8 @@ class CommandLine
   end
 
   def main
-    @options[:input] = input = ARGV.shift
-    @options[:output] = output = ARGV.shift
+    @options[:input] = input = @args.shift
+    @options[:output] = output = @args.shift
 
     helpful_exit if input.nil?
 
