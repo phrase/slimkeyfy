@@ -54,7 +54,7 @@ class Transformer
 
       la += 1
     end
-    ""
+    nil
   end
 
   def param_list(before, arguments)
@@ -67,7 +67,8 @@ class Transformer
         tokens.join(" ")
       else
         translation = tokens[1..-1].join(" ")
-        if match_string(translation) then
+        if matches_string?(translation) then
+          translation = match_string(translation)
           _, translation_key = @word.update_translation_key_hash(translation)
           tokens.join(" ").gsub(/"(.*)"/, "#{translation_key}")
         else
@@ -76,6 +77,10 @@ class Transformer
       end
     }.join(", ")
     "#{before} #{translated}"
+  end
+
+  def pr(pre, msg)
+    puts "#{pre}=#{msg}"
   end
 
   def to_equals_tag(s)
@@ -88,8 +93,12 @@ class Transformer
     s
   end
 
-  def match_string(translation)
+  def matches_string?(translation)
     translation.match(/"(.*)"/) != nil
+  end
+
+  def match_string(translation)
+    translation.match(/"(.*)"/) ? $1 : translation
   end
 
   def normalize_full_translation(translation)
@@ -97,6 +106,7 @@ class Transformer
   end
 
   def normalize_parted_translations(before_translation, translation, after_translation="")
+    translation = match_string(translation)
     translation, translation_key = @word.update_translation_key_hash(translation)
     ["#{@word.indentation}#{before_translation} #{translation_key} #{after_translation}", @word.translations]
   end
@@ -139,20 +149,15 @@ class Word
   end
 
   def update_translation_key_hash(translation)
-    translation = match_string(translation)
     translation_key = TranslationKeyBuilder.new(@key_base, translation).build
     @translations[translation_key] = translation
     [translation, i18nString(translation_key)]
   end
-
-  def match_string(translation)
-    m = translation.match(/\"(.*)\"/)
-    m != nil ? $1 : translation
-  end
 end
 
 class TranslationKeyBuilder
-  SPECIAL_CHARS = /[:\-"'\(\)\|\}\{\]\[#\.,;!?]+/
+  VALID = /[^0-9a-z]/i
+  DEFAULT_KEY_NAME = "default_key"
 
   def initialize(key_base, translation)
     @key_base = key_base
@@ -164,21 +169,19 @@ class TranslationKeyBuilder
   end
 
   def generate_key_name
-    t = @translation.split(" ")
-    if t.size >= 1 then
-      four_words = t[0..3].join("_").downcase
-      strip_special_chars = four_words.gsub(SPECIAL_CHARS, "_").gsub(/[_]+/, "_")
-      strip_underscores(strip_special_chars, "_")[0..20]
-    else
-      ('a'..'z').to_a.shuffle[0,12].join
+    normalized_translation = DEFAULT_KEY_NAME
+    unless (@translation.nil? or @translation.empty?) then
+      normalized_translation = @translation.gsub(VALID, "_").gsub(/[_]+/, "_").downcase[0..20]
     end
+    return DEFAULT_KEY_NAME if normalized_translation.strip == "_"
+    strip_underscores(normalized_translation)
   end
 
-  def strip_underscores(s, delim)
-    if s.start_with?(delim) then
+  def strip_underscores(s)
+    if s.start_with?("_") then
       s = s[1..-1]
     end
-    if s.end_with?(delim) then
+    if s.end_with?("_") then
       s = s[0..-2]
     end
     s
