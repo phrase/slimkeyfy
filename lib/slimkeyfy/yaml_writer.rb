@@ -1,5 +1,4 @@
-require 'yaml' 
-require './file_utils'
+require 'yaml'
 
 class YamlWriter
 

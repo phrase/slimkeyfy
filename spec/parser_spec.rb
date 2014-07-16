@@ -1,4 +1,4 @@
-require_relative '../lib/parser'
+require_relative '../lib/slimkeyfy/parser'
 
 describe "Transformer should transform .slim correctly" do
 
