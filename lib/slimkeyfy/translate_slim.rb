@@ -16,6 +16,7 @@ class TranslateSlim
       if translations_are_invalid?(translations)
         @new_content << old_line
       else
+        #@translation_hash.merge!(word.translations)
         @new_content << new_line
       end
     end
@@ -41,6 +42,7 @@ class TranslateSlim
       if translations_are_invalid?(translations)
         update_with(idx, old_line)
       else
+        #@translation_hash.merge!(word.translations)
         process_new_line(idx, old_line, new_line, translations)
       end
 
@@ -70,7 +72,7 @@ class TranslateSlim
   end
 
   def translations_to_yaml
-    YamlWriter.new("", "", "")
+    YamlWriter.new("/Users/matthias/dev/phrase_proj/tkey_slims/en.yml", @translation_hash, "en").process_and_store!
   end
 end
 

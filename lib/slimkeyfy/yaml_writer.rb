@@ -33,3 +33,7 @@ class Hash
 end
 
 #YamlWriter.new("#{p}test.yaml",h).process_and_store!
+
+# duplication
+# -r recursives verhalten
+# key split words

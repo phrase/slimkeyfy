@@ -115,8 +115,37 @@ class Word
 
   def update_translation_key_hash(translation)
     translation_key = TranslationKeyBuilder.new(@key_base, translation).build
-    @translations[translation_key] = translation
+    translation_key, translation = merge(translation_key, translation)
     [translation, i18nString(translation_key)]
+  end
+
+  # merge key => value pair into Hash
+  # 1.) merge(a, 2) with {a => 1} results in {a => 1, a1 => 2} return [a1, 2]
+  # 2.) merge(b, 1) with {a => 1} results in  {a => 1} return [a, 1]
+  # 3.) merge(c, 3) with {a => 1} results in  {a => 1, c => 3} return [c, 3]
+  def merge(translation_key, translation)
+    k, v = translation_key, translation
+    if @translations.has_key?(k) then
+      if @translations[k] != v then
+        num = 1
+        k = "#{translation_key}#{num}"
+        while @translations.has_key?(k) do
+          k = "#{translation_key}#{num}"
+          num += 1
+        end
+        @translations[k] = v
+      else
+        @translations[k] = v
+      end
+    else
+      @translations.each do |k1, v1|
+        if v1 == v then
+          return [k1, v] 
+        end
+      end
+      @translations[k] = v
+    end
+    [k, v]
   end
 end
 
@@ -136,7 +165,8 @@ class TranslationKeyBuilder
   def generate_key_name
     normalized_translation = DEFAULT_KEY_NAME
     if not (@translation.nil? or @translation.empty?) then
-      normalized_translation = @translation.gsub(VALID, "_").gsub(/[_]+/, "_").downcase[0..20]
+      normalized_translation = @translation.gsub(VALID, "_").gsub(/[_]+/, "_").downcase
+      normalized_translation = normalized_translation.split("_")[0..3].join("_")
     end
     return DEFAULT_KEY_NAME if normalized_translation.strip == "_"
     strip_underscores(normalized_translation)
