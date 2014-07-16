@@ -1,14 +1,4 @@
 
-class Matcher
-  LEXEMS = [
-    /^(\||[a-z]+[0-9]?)/, # match all normal html tags
-    /(?![-])=\s+([a-z]+[0-9]?[\._]?[a-z]+)/ # match all lines with a slim ruby tag
-  ]
-  def self.match(word)
-    LEXEMS.select{|regex| word.match(regex) }
-  end
-end
-
 class Transformer
 
   HTML_TAGS = /^(\||[a-z]+[0-9]?)/
@@ -77,10 +67,6 @@ class Transformer
       end
     }.join(", ")
     "#{before} #{translated}"
-  end
-
-  def pr(pre, msg)
-    puts "#{pre}=#{msg}"
   end
 
   def to_equals_tag(s)
@@ -170,7 +156,7 @@ class TranslationKeyBuilder
 
   def generate_key_name
     normalized_translation = DEFAULT_KEY_NAME
-    unless (@translation.nil? or @translation.empty?) then
+    if not (@translation.nil? or @translation.empty?) then
       normalized_translation = @translation.gsub(VALID, "_").gsub(/[_]+/, "_").downcase[0..20]
     end
     return DEFAULT_KEY_NAME if normalized_translation.strip == "_"

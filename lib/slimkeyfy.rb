@@ -15,15 +15,12 @@ class TranslateSlim
   def unix_diff_mode
     @content.each do |old_line|
       word = Word.new(old_line, @key_base)
-      matcher = Matcher.match(word)
-      if not matcher.empty? then
-        new_line, translations = Transformer.new(word).transform
-        if translations_are_invalid?(translations)
-          @new_content << old_line
-        else
-          @new_content << new_line
-        end
-      else @new_content << old_line end
+      new_line, translations = Transformer.new(word).transform
+      if translations_are_invalid?(translations)
+        @new_content << old_line
+      else
+        @new_content << new_line
+      end
     end
     process_unix_diff
   end
@@ -42,19 +39,13 @@ class TranslateSlim
     @content.each_with_index do |old_line, idx|
 
       word = Word.new(old_line, @key_base)
-      matcher = Matcher.match(word)
+      new_line, translations = Transformer.new(word).transform
 
-      if not matcher.empty? then
-
-        new_line, translations = Transformer.new(word).transform
-
-        if translations_are_invalid?(translations)
-          update_with(idx, old_line)
-        else
-          process_new_line(idx, old_line, new_line, translations)
-        end
-
-      else update_with(idx, old_line) end
+      if translations_are_invalid?(translations)
+        update_with(idx, old_line)
+      else
+        process_new_line(idx, old_line, new_line, translations)
+      end
 
       FileWriter.append(@file_path, @new_content[idx])
     end
@@ -88,6 +79,6 @@ class SlimKeyfy
   end
 end
 
-SlimKeyfy.translate!
+# SlimKeyfy.translate!
 
 
