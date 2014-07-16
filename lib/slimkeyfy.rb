@@ -88,4 +88,6 @@ class SlimKeyfy
   end
 end
 
+SlimKeyfy.translate!
+
 

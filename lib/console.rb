@@ -54,12 +54,18 @@ end
 
 class CommandLine
   def initialize
+    helpful_exit if ARGV.size < 1
     @options = {}
     @opts = OptionParser.new(&method(:opt_scan)).parse!
   end
 
+  def helpful_exit
+    puts "Please provide at least a path. See -h for more information."
+    exit
+  end
+
   def opt_scan(opts)
-    opts.banner = "Usage: translateSlim INPUT_FILENAME_OR_DIRECTORY [OUTPUT_FILENAME_OR_DIRECTORY] [Options]"
+    opts.banner = "Usage: slimkeyfy INPUT_FILENAME_OR_DIRECTORY [OUTPUT_FILENAME_OR_DIRECTORY] [Options]"
     opts.on_tail('-h', '--help', 'Show this message') do
       puts opts
       exit
@@ -72,6 +78,8 @@ class CommandLine
   def main
     @options[:input] = input = ARGV.shift
     @options[:output] = output = ARGV.shift
+
+    helpful_exit if input.nil?
 
     if File.directory?(input) then
       FileUtils.walk(input).each do |inp|
