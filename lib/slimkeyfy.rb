@@ -82,6 +82,10 @@ class TranslateSlim
   end
 end
 
-CommandLine.new.main
+class SlimKeyfy
+  def self.translate!
+    CommandLine.new.main
+  end
+end
 
 
