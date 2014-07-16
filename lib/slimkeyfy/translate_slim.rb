@@ -6,6 +6,7 @@ class TranslateSlim
     @file_path = FileUtils.create_new_file(@options)
     @key_base = translation_key_base
     @new_content = []
+    @translation_hash = {}
   end
 
   def unix_diff_mode
@@ -67,6 +68,12 @@ class TranslateSlim
     fname = FileWriter.file_basename(@file_path)
     "#{dirname}.#{fname}"
   end
+
+  def translations_to_yaml
+    YamlWriter.new("", "", "")
+  end
 end
+
+
 
 

@@ -16,35 +16,14 @@ class Transformer
     result = case tokens[0]
       when HTML_TAGS then
         normalize_parted_translations(to_equals_tag(tokens[0]), @word.slice(1, -1))
+      when "=" then
+        if tokens[1].match(STARTING_EQUALS) then
+          args = tokens[1..-1].join(" ")
+          normalize_full_translation(param_list("=", args))
+        else nil end
       else nil end
 
-    if result.nil? then
-      return advanced_transform
-    end
-
     result
-  end
-
-  def advanced_transform
-    tokens = @word.as_list
-    la = 0
-    while la < tokens.size do
-      result = case tokens[la]
-        when "=" then
-          la += 1
-          if tokens[la].match(STARTING_EQUALS) then
-            args = tokens[la..-1].join(" ")
-            normalize_full_translation(param_list("=", args))
-          else nil end
-        else nil end
-
-      if not result.nil? then
-        return result
-      end
-
-      la += 1
-    end
-    nil
   end
 
   def param_list(before, arguments)
