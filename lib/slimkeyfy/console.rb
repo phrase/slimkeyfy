@@ -55,7 +55,7 @@ end
 class CommandLine
   def initialize(args)
     helpful_exit if ARGV.size < 1
-    @options = {}
+    @options = { :locale => "en" }
     @args = args
     OptionParser.new(&method(:opt_scan)).parse!(@args)
   end
@@ -78,6 +78,9 @@ class CommandLine
       Without -r and a directory just the files within the first level are walked.') do
       @options[:recursive] = true
     end
+    opts.on("-l", "--locale country_code", 'Give a Locale (en, de, pl) which you would like to translate') do |country_code|
+      @options[:locale] = country_code
+    end
   end
 
   def main
@@ -85,6 +88,7 @@ class CommandLine
     @options[:output] = output = @args.shift
 
     helpful_exit if input.nil?
+    puts "locale=#{@options[:locale]}"
 
     if File.directory?(input) then
       directory_translate(input)
@@ -107,7 +111,7 @@ class CommandLine
   end
 
   def translate
-    puts "file=#{@options[:input]} diff=#{@options[:diff]}"
+    puts "file=#{@options[:input]}"
     translate_slim = TranslateSlim.new(@options)
     if @options[:diff] then
       translate_slim.unix_diff_mode
