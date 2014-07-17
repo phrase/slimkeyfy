@@ -1,0 +1,31 @@
+= simple_form_for [more_stuff, @stuff], remote: ajax?, html: {id: "stuff", class: "form-vertical"}, validate: true do |f|
+
+  ul.nav.nav-tabs
+    li.active
+      = link_to "Settings", "#settings", data: { toggle: "tab" }
+
+  .tab-content
+    .tab-pane.active#settings
+      = f.input :description, input_html: {rows: 2}, hint: "Additional information for you"
+      - if current_project.has_default_locale?
+        = f.input :default_translation_content, as: :text, label: "Default", input_html: {rows: 6}, hint: "Enter some default"
+
+    .tab-pane#extended
+      = f.input :data_type, label: "Type", collection: some_data, include_blank: false, hint: "Some formats (e.g. YAML) support data types, leave it to String otherwise"
+
+    .tab-pane#pluralization
+      = f.input :name_plural, label: "Plural Key Name", input_html: {rows: 2}, hint: "Some formats (e.g. Gettext) support a separate name that is used when rendering a pluralized key."
+
+    .tab-pane#screenshot
+      = f.input :screenshot, as: :file
+      .control-group
+        .controls
+          #screenshot-image= link_to(image_tag(@something.screenshot_url(:thumbnail), class: "img-polaroid"), @something.screenshot_url(:large)) if @something.screenshot?
+      = f.input :remove_screenshot, as: :boolean, inline_label: "Remove screenshot", label: false if @something.screenshot?
+
+  - unless ajax?
+    .form-actions
+      = f.button :submit, "Save", class: "btn btn-primary"
+      span.cancel
+        | &nbsp;or&nbsp;
+        = form_cancel_link(some_project(something))
