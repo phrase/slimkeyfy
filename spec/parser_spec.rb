@@ -36,22 +36,49 @@ describe "Transformer should transform .slim correctly" do
   end
 
   describe "when line starts with equal" do
+
     context "when word contains link_to" do
-      let(:word) { Word.new('= link_to "Settings", "#settings", data: { toggle: "tab" }', "key_base") }
+      let( :raw_input ) { '= link_to "Settings", "#settings", data: { toggle: "tab" }' }
+      let(:word) { Word.new(raw_input, "key_base") }
       let(:translated) { '= link_to t(\'key_base.settings\'), "#settings", data: { toggle: "tab" }' }
-      let(:translation_hash) { {"key_base.settings"=>"Settings"} }
+      let(:translation_hash) { {"key_base.settings" => "Settings"} }
       it { should == [ translated , translation_hash] }
     end
+
     context "when word contains [a-z].input"  do
-      let(:word) { Word.new('= f.input :max_characters_allowed, 
-        label: "Max. Characters", hint: "Shows an indicator how..."', "key_base") }
-      let(:translated) { "= f.input :max_characters_allowed, label: t('key_base.max_characters'), hint: t('key_base.shows_an_indicator_ho')" }
-      let(:translation_hash) { {"key_base.max_characters"=>"Max. Characters", "key_base.shows_an_indicator_ho"=>"Shows an indicator how..."} }
+      let( :raw_input ) { '= f.input :max_characters_allowed, label: "Max. Characters", hint: "Shows an indicator how..."' }
+      let(:word) { Word.new(raw_input, "key_base") }
+      let(:translated) { 
+        "= f.input :max_characters_allowed, label: t('key_base.max_characters'), hint: t('key_base.shows_an_indicator_how')" 
+      }
+      let(:translation_hash) { 
+        {"key_base.max_characters"=>"Max. Characters", "key_base.shows_an_indicator_how"=>"Shows an indicator how..."}
+      }
       it { should == [ translated , translation_hash] }
     end
+
   end
 end
 
+describe "Word" do
+  let( :key_base ) { "key_base" }
+  let( :translation ) { "Hello World!" }
+  let( :word ) { Word.new(translation, key_base) }
+
+  describe "merge should work" do
+    it "should" do
+      word.translations = {"a" => 1, "a1" => 2, "a3" => 3, "b" => 5,"a4" => 4}
+    end
+    subject { word.merge("a", 2) }
+    it { should ==  ["a1", 2] }
+    subject { word.merge("b", 2) }
+    it { should ==  ["b1", 2] }
+    subject { word.merge("c", 2) }
+    it { should ==  ["a1", 2] }
+    subject { word.merge("d", 10) }
+    it { should ==  ["d", 10] }
+  end
+end
 
 describe "TranslationKeyBuilder" do
   let( :key_base ) { "translation_key_base" }

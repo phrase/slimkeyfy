@@ -2,8 +2,9 @@ class TranslateSlim
 
   def initialize(options={})
     @options = options
-    @bak_path, @content = FileUtils.create_backup(@options)
-    @file_path = FileUtils.create_new_file(@options)
+    @bak_path = MFileUtils.backup(@options[:input])
+    @content = FileReader.read(@bak_path).split("\n")
+    @file_path = MFileUtils.create_new_file(@options)
     @key_base = translation_key_base
     @new_content = []
     @translation_hash = {}
@@ -12,11 +13,11 @@ class TranslateSlim
   def unix_diff_mode
     @content.each do |old_line|
       word = Word.new(old_line, @key_base)
-      new_line, translations = Transformer.new(word).transform
+      @translation_hash, new_line, translations = Transformer.new(word, @translation_hash).transform
       if translations_are_invalid?(translations)
+        delete_invalid_translations(translations)
         @new_content << old_line
       else
-        #@translation_hash.merge!(word.translations)
         @new_content << new_line
       end
     end
@@ -35,17 +36,14 @@ class TranslateSlim
 
   def stream_mode
     @content.each_with_index do |old_line, idx|
-
       word = Word.new(old_line, @key_base)
-      new_line, translations = Transformer.new(word).transform
-
+      @translation_hash, new_line, translations = Transformer.new(word, @translation_hash).transform
       if translations_are_invalid?(translations)
+        delete_invalid_translations(translations)
         update_with(idx, old_line)
       else
-        #@translation_hash.merge!(word.translations)
         process_new_line(idx, old_line, new_line, translations)
       end
-
       FileWriter.append(@file_path, @new_content[idx])
     end
   end
@@ -73,6 +71,11 @@ class TranslateSlim
 
   def translations_to_yaml
     YamlWriter.new("/Users/matthias/dev/phrase_proj/tkey_slims/en.yml", @translation_hash, "en").process_and_store!
+  end
+
+  def delete_invalid_translations(translations)
+    return if translations.nil?
+    translations.keys.each{|k| @translation_hash.delete(k)}
   end
 end
 

@@ -5,32 +5,40 @@ class Transformer
   STARTING_EQUALS = /([a-z]+[0-9]?[\._]?[a-z]+)/
   HTML_STRING_PARAMETERS = /(label|hint|[a-z]\.input|[a-z]\.button|link_to|submit)/
 
-  def initialize(word)
+  def initialize(word, translation_hash)
     @word = word
+    @translation_hash = translation_hash
   end
 
   def transform
     tokens = @word.as_list
-    return nil if tokens.nil? or tokens.size < 2
+    return nil_elem if tokens.nil? or tokens.size < 2
 
     result = case tokens[0]
       when HTML_TAGS then
-        normalize_parted_translations(to_equals_tag(tokens[0]), @word.slice(1, -1))
+        tagged_with_equals = to_equals_tag(tokens[0])
+        translation = match_string(@word.slice(1, -1))
+        @translation_hash, _, translation_key = update_hashes(translation)
+        normalize_translation(tagged_with_equals, translation_key)
       when "=" then
         if tokens[1].match(STARTING_EQUALS) then
-          args = tokens[1..-1].join(" ")
-          normalize_full_translation(param_list("=", args))
-        else nil end
-      else nil end
+          translated_arguments = html_argument_list(tokens[1..-1].join(" "))
+          normalize_translation("=", translated_arguments)
+        else nil_elem end
+      else nil_elem end
 
     result
   end
 
-  def param_list(before, arguments)
-    r1 = arguments.split(", ")
-    r2 = r1.map{|tokens| tokens.split(" ") }
+  def nil_elem
+    [@translation_hash, nil, nil]
+  end
 
-    translated = r2.map{ |tokens| 
+  def html_argument_list(arguments)
+    raw_args = arguments.split(", ")
+    raw_arg_tokens = raw_args.map{|tokens| tokens.split(" ") }
+
+    translated = raw_arg_tokens.map{ |tokens| 
       m = tokens[0].match(HTML_STRING_PARAMETERS)
       if m.nil? then
         tokens.join(" ")
@@ -38,14 +46,14 @@ class Transformer
         translation = tokens[1..-1].join(" ")
         if matches_string?(translation) then
           translation = match_string(translation)
-          _, translation_key = @word.update_translation_key_hash(translation)
+          @translation_hash, _, translation_key = update_hashes(translation)
           tokens.join(" ").gsub(/"(.*)"/, "#{translation_key}")
         else
           tokens.join(" ")
         end
       end
     }.join(", ")
-    "#{before} #{translated}"
+    translated
   end
 
   def to_equals_tag(s)
@@ -66,14 +74,12 @@ class Transformer
     translation.match(/"(.*)"/) ? $1 : translation
   end
 
-  def normalize_full_translation(translation)
-    ["#{@word.indentation}#{translation}", @word.translations]
+  def normalize_translation(before_translation, translation)
+    [@translation_hash, "#{@word.indentation}#{before_translation} #{translation}", @word.translations]
   end
 
-  def normalize_parted_translations(before_translation, translation, after_translation="")
-    translation = match_string(translation)
-    translation, translation_key = @word.update_translation_key_hash(translation)
-    ["#{@word.indentation}#{before_translation} #{translation_key} #{after_translation}", @word.translations]
+  def update_hashes(translation)
+    @word.update_translation_key_hash(@translation_hash, translation)
   end
 end
 
@@ -113,39 +119,11 @@ class Word
     "t('#{translation_key}')"
   end
 
-  def update_translation_key_hash(translation)
+  def update_translation_key_hash(all_translations, translation)
     translation_key = TranslationKeyBuilder.new(@key_base, translation).build
-    translation_key, translation = merge(translation_key, translation)
-    [translation, i18nString(translation_key)]
-  end
-
-  # merge key => value pair into Hash
-  # 1.) merge(a, 2) with {a => 1} results in {a => 1, a1 => 2} return [a1, 2]
-  # 2.) merge(b, 1) with {a => 1} results in  {a => 1} return [a, 1]
-  # 3.) merge(c, 3) with {a => 1} results in  {a => 1, c => 3} return [c, 3]
-  def merge(translation_key, translation)
-    k, v = translation_key, translation
-    if @translations.has_key?(k) then
-      if @translations[k] != v then
-        num = 1
-        k = "#{translation_key}#{num}"
-        while @translations.has_key?(k) do
-          k = "#{translation_key}#{num}"
-          num += 1
-        end
-        @translations[k] = v
-      else
-        @translations[k] = v
-      end
-    else
-      @translations.each do |k1, v1|
-        if v1 == v then
-          return [k1, v] 
-        end
-      end
-      @translations[k] = v
-    end
-    [k, v]
+    all_translations, translation_key, translation = Merger.merge_single_translation(all_translations, translation_key, translation)
+    @translations.merge!({translation_key => translation})
+    [all_translations, translation, i18nString(translation_key)]
   end
 end
 
@@ -163,13 +141,17 @@ class TranslationKeyBuilder
   end
 
   def generate_key_name
-    normalized_translation = DEFAULT_KEY_NAME
+    normalized_translation = ""
     if not (@translation.nil? or @translation.empty?) then
       normalized_translation = @translation.gsub(VALID, "_").gsub(/[_]+/, "_").downcase
       normalized_translation = normalized_translation.split("_")[0..3].join("_")
     end
-    return DEFAULT_KEY_NAME if normalized_translation.strip == "_"
+    return DEFAULT_KEY_NAME if is_not_valid?(normalized_translation.strip)
     strip_underscores(normalized_translation)
+  end
+
+  def is_not_valid?(normalized_translation)
+    (normalized_translation.strip == "_" or normalized_translation.empty?)
   end
 
   def strip_underscores(s)
