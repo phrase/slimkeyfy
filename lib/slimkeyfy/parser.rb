@@ -17,7 +17,7 @@ class Transformer
     result = case tokens[0]
       when HTML_TAGS then
         tagged_with_equals = to_equals_tag(tokens[0])
-        translation = match_string(@word.slice(1, -1))
+        translation = match_string(@word.slice(1, -1)).gsub("&nbsp;", " ")
         @translation_hash, _, translation_key = update_hashes(translation)
         normalize_translation(tagged_with_equals, translation_key)
       when "=" then
@@ -45,7 +45,7 @@ class Transformer
       else
         translation = tokens[1..-1].join(" ")
         if matches_string?(translation) then
-          translation = match_string(translation)
+          translation = match_string(translation).gsub("&nbsp;", " ")
           @translation_hash, _, translation_key = update_hashes(translation)
           tokens.join(" ").gsub(/"(.*)"/, "#{translation_key}")
         else
