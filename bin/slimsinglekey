@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby
-
-require_relative '../lib/slimkeyfy'
-
-SlimKeyfy.convert_single_key(ARGV[0])
