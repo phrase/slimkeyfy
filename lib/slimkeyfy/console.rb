@@ -49,6 +49,20 @@ class IOAction
       self.yes_or_no?(msg)
     end
   end
+  def self.yes_no_or_maybe(msg)
+    puts "#{msg} (y|n|x)"
+    arg = STDIN.gets.chomp
+    if arg =~ /[yY](es)?/ then
+      "y"
+    elsif arg =~ /[nN]o?/ then
+      "n"
+    elsif arg =~ /x/ then
+      "x"
+    else
+      puts "Provide either (y)es, (n)o or x for tagging!"
+      self.yes_no_or_maybe(msg)
+    end
+  end
 end
 
 

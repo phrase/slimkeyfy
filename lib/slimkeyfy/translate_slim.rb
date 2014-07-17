@@ -51,9 +51,16 @@ class TranslateSlim
 
   def process_new_line(idx, old_line, new_line, translations)
     ConsolePrinter.difference(old_line, new_line, translations)
-    if IOAction.yes_or_no?("Changes wanted?") then
-      update_with(idx, new_line)
-    else update_with(idx, old_line) end
+    case IOAction.yes_no_or_maybe("Changes wanted?")
+      when "y" then update_with(idx, new_line)
+      when "n" then update_with(idx, old_line)
+      when "x" then update_with(idx, tag(old_line, new_line))
+    end
+  end
+
+  def tag(old_line, new_line)
+    delim = "<#{"="*50}>"
+    "#{delim}\n#{old_line}\n#{new_line}\n#{delim}"
   end
 
   def finalize!
