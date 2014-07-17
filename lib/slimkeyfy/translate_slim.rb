@@ -54,9 +54,14 @@ class TranslateSlim
   end
 
   def finalize!
-    if IOAction.yes_or_no?("Do you like what you see?") then
-      puts "Have a nice day!"
-    else
+    begin
+      if IOAction.yes_or_no?("Do you like what you see?") then
+        puts "Processed!"
+      else
+        MFileUtils.restore(@bak_path, @original_file_path)
+        puts "Restored!"
+      end
+    rescue SystemExit, Interrupt
       MFileUtils.restore(@bak_path, @original_file_path)
     end
   end
