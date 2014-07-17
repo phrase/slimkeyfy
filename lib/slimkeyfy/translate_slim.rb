@@ -2,7 +2,8 @@ class TranslateSlim
 
   def initialize(options={})
     @options = options
-    @bak_path = MFileUtils.backup(@options[:input])
+    @original_file_path = @options[:input]
+    @bak_path = MFileUtils.backup(@original_file_path)
     @content = FileReader.read(@bak_path).split("\n")
     @file_path = MFileUtils.create_new_file(@options)
     @key_base = translation_key_base
@@ -27,11 +28,7 @@ class TranslateSlim
   def process_unix_diff
     FileWriter.write(@file_path, @new_content.join("\n"))
     ConsolePrinter.unix_diff(@bak_path, @file_path)
-    if IOAction.yes_or_no?("Do you like what you see?") then
-      puts "Have a nice day!"
-    else
-      FileWriter.write(@file_path, @content.join("\n"))
-    end
+    finalize!
   end
 
   def stream_mode
@@ -44,8 +41,9 @@ class TranslateSlim
       else
         process_new_line(idx, old_line, new_line, translations)
       end
-      FileWriter.append(@file_path, @new_content[idx])
     end
+    FileWriter.write(@file_path, @new_content.join("\n"))
+    finalize!
   end
 
   def process_new_line(idx, old_line, new_line, translations)
@@ -53,6 +51,14 @@ class TranslateSlim
     if IOAction.yes_or_no?("Changes wanted?") then
       update_with(idx, new_line)
     else update_with(idx, old_line) end
+  end
+
+  def finalize!
+    if IOAction.yes_or_no?("Do you like what you see?") then
+      puts "Have a nice day!"
+    else
+      MFileUtils.restore(@bak_path, @original_file_path)
+    end
   end
 
   def update_with(idx, line)

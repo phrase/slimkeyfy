@@ -2,6 +2,10 @@ require 'find'
 require 'fileutils'
 
 class MFileUtils
+  def self.restore(backup_path, original_file_path)
+    FileUtils.cp(backup_path, original_file_path)
+    FileUtils.rm(backup_path)
+  end
   def self.backup(input)
     original_file_path = abs_path(input)
     backup_path = "#{original_file_path}.bak"
