@@ -87,16 +87,22 @@ class CommandLine
     helpful_exit if input.nil?
 
     if File.directory?(input) then
-      rec = @options.fetch(:recursive, false)
-      MFileUtils.walk(input, rec).each do |inp|
-        @options[:input] = inp
-        translate
-      end
+      directory_translate(input)
     elsif File.file?(input) then
       translate
     else
       raise "Please provide a file or directory!"
       exit
+    end
+  end
+
+  def directory_translate(input)
+    rec = @options.fetch(:recursive, false)
+    MFileUtils.walk(input, rec).each do |rec_input|
+      if File.file?(rec_input) then
+        @options[:input] = rec_input
+        translate
+      end
     end
   end
 

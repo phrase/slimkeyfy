@@ -10,5 +10,3 @@ require_relative 'slimkeyfy/console'
 require_relative 'slimkeyfy/yaml_writer'
 require_relative 'slimkeyfy/translate_slim'
 require_relative 'slimkeyfy/parser'
-
-# SlimKeyfy.translate(ARGV)
