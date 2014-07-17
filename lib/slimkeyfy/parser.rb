@@ -4,6 +4,7 @@ class Transformer
   HTML_TAGS = /^(\||[a-z]+[0-9]?)/
   STARTING_EQUALS = /([a-z]+[0-9]?[\._]?[a-z]+)/
   HTML_STRING_PARAMETERS = /(label|hint|[a-z]\.input|[a-z]\.button|link_to|submit)/
+  T_TAG = /t\(['"][a-z\_]+["']\)/
 
   def initialize(word, translation_hash)
     @word = word
@@ -12,7 +13,7 @@ class Transformer
 
   def transform
     tokens = @word.as_list
-    return nil_elem if tokens.nil? or tokens.size < 2
+    return nil_elem if should_not_be_processed?(tokens)
 
     result = case tokens[0]
       when HTML_TAGS then
@@ -28,6 +29,10 @@ class Transformer
       else nil_elem end
 
     result
+  end
+
+  def should_not_be_processed?(tokens)
+    (tokens.nil? or tokens.size < 2 or @word.line.match(T_TAG))
   end
 
   def nil_elem
@@ -88,11 +93,10 @@ class Word
   attr_reader :line, :tokens, :indentation
   attr_accessor :translations
 
-  def initialize(line, key_base)
+  def initialize(line)
     @line = escape(line)
     @indentation = " " * (@line.size - unindented_line.size)
     @translations = {}
-    @key_base = key_base
   end
 
   def as_list(delim=" ")
@@ -120,7 +124,7 @@ class Word
   end
 
   def update_translation_key_hash(all_translations, translation)
-    translation_key = TranslationKeyBuilder.new(@key_base, translation).build
+    translation_key = TranslationKeyBuilder.new(translation).generate_key_name
     all_translations, translation_key, translation = Merger.merge_single_translation(all_translations, translation_key, translation)
     @translations.merge!({translation_key => translation})
     [all_translations, translation, i18nString(translation_key)]
@@ -131,13 +135,8 @@ class TranslationKeyBuilder
   VALID = /[^0-9a-z]/i
   DEFAULT_KEY_NAME = "default_key"
 
-  def initialize(key_base, translation)
-    @key_base = key_base
+  def initialize(translation)
     @translation = translation
-  end
-
-  def build
-    "#{@key_base}.#{generate_key_name}"
   end
 
   def generate_key_name

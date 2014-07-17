@@ -55,7 +55,7 @@ end
 class CommandLine
   def initialize(args)
     helpful_exit if ARGV.size < 1
-    @options = { :locale => "en" }
+    @options = { :yaml_file => "config/locales/en.yml" }
     @args = args
     OptionParser.new(&method(:opt_scan)).parse!(@args)
   end
@@ -78,8 +78,8 @@ class CommandLine
       Without -r and a directory just the files within the first level are walked.') do
       @options[:recursive] = true
     end
-    opts.on("-l", "--locale country_code", 'Give a Locale (en, de, pl) which you would like to translate') do |country_code|
-      @options[:locale] = country_code
+    opts.on("-y", "--yaml path_to_yaml", 'Give a path to the specific yaml Locale you would like to translate') do |path_to_yaml|
+      @options[:yaml_file] = path_to_yaml
     end
   end
 
@@ -88,7 +88,7 @@ class CommandLine
     @options[:output] = output = @args.shift
 
     helpful_exit if input.nil?
-    puts "locale=#{@options[:locale]}"
+    puts "yaml file=#{@options[:yaml_file]}"
 
     if File.directory?(input) then
       directory_translate(input)

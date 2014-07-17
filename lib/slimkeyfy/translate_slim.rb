@@ -6,20 +6,22 @@ class TranslateSlim
     @bak_path = MFileUtils.backup(@original_file_path)
     @content = FileReader.read(@bak_path).split("\n")
     @file_path = MFileUtils.create_new_file(@options)
-    @key_base = translation_key_base
+    @yaml_processor = YamlProcessor.new(options[:yaml_file])
     @new_content = []
-    @translation_hash = {}
+    @translation_hash = @yaml_processor.yaml_hash
+    @changes = false
   end
 
   def unix_diff_mode
     @content.each do |old_line|
-      word = Word.new(old_line, @key_base)
+      word = Word.new(old_line)
       @translation_hash, new_line, translations = Transformer.new(word, @translation_hash).transform
       if translations_are_invalid?(translations)
         delete_invalid_translations(translations)
         @new_content << old_line
       else
         @new_content << new_line
+        @changes = true
       end
     end
     process_unix_diff
@@ -33,13 +35,14 @@ class TranslateSlim
 
   def stream_mode
     @content.each_with_index do |old_line, idx|
-      word = Word.new(old_line, @key_base)
+      word = Word.new(old_line)
       @translation_hash, new_line, translations = Transformer.new(word, @translation_hash).transform
       if translations_are_invalid?(translations)
         delete_invalid_translations(translations)
         update_with(idx, old_line)
       else
         process_new_line(idx, old_line, new_line, translations)
+        @changes = true
       end
     end
     FileWriter.write(@file_path, @new_content.join("\n"))
@@ -55,14 +58,21 @@ class TranslateSlim
 
   def finalize!
     begin
-      if IOAction.yes_or_no?("Do you like what you see?") then
-        puts "Processed!"
-      else
-        MFileUtils.restore(@bak_path, @original_file_path)
-        puts "Restored!"
+      if @changed then
+        if IOAction.yes_or_no?("Do you like what you see?") then
+          @yaml_processor.store!(@translation_hash)
+          puts "Processed!"
+        else
+          MFileUtils.restore(@bak_path, @original_file_path)
+          @yaml_processor.restore
+          puts "Restored!"
+        end
+      else 
+        puts "Nothing was changed!" 
       end
     rescue SystemExit, Interrupt
       MFileUtils.restore(@bak_path, @original_file_path)
+      yaml_processor.restore
     end
   end
 
@@ -72,16 +82,6 @@ class TranslateSlim
 
   def translations_are_invalid?(translations)
     translations.nil? or translations.empty?
-  end
-
-  def translation_key_base
-    dirname = FileWriter.subdir_name(@file_path)
-    fname = FileWriter.file_basename(@file_path)
-    "#{dirname}.#{fname}"
-  end
-
-  def translations_to_yaml
-    YamlWriter.new("/Users/matthias/dev/phrase_proj/tkey_slims/en.yml", @translation_hash, "en").process_and_store!
   end
 
   def delete_invalid_translations(translations)
