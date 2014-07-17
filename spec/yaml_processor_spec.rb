@@ -1,4 +1,4 @@
-require_relative '../lib/slimkeyfy/yaml_writer'
+require_relative '../lib/slimkeyfy/yaml_processor'
 
 describe "Merger" do
   let ( :translation_hash ) { {"a" => 1, "a1" => 2, "a3" => 3, "b" => 5} }

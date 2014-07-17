@@ -58,7 +58,7 @@ class TranslateSlim
 
   def finalize!
     begin
-      if @changed then
+      if @changes then
         if IOAction.yes_or_no?("Do you like what you see?") then
           @yaml_processor.store!(@translation_hash)
           puts "Processed!"

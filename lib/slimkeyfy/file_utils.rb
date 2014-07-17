@@ -6,6 +6,9 @@ class MFileUtils
     FileUtils.cp(backup_path, original_file_path)
     FileUtils.rm(backup_path)
   end
+  def self.rm(file_path)
+    FileUtils.rm(file_path)
+  end
   def self.backup(input)
     original_file_path = abs_path(input)
     backup_path = "#{original_file_path}.bak"

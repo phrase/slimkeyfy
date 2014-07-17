@@ -25,7 +25,7 @@ class YamlProcessor
   end
 
   def extract_locale
-    File.basename(@yaml_file_path).split(".")[0]
+    File.basename(@yaml_file_path).split(".")[1]
   end
 end
 
