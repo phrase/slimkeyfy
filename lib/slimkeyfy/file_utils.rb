@@ -29,10 +29,15 @@ class MFileUtils
   def self.abs_path(file)
     File.absolute_path(file)
   end
-  def self.walk(arg)
+  def self.walk(arg, recursive=false)
+    directory = abs_path(arg)
     files = []
-    Find.find(abs_path(arg)) do |f|
-      files << f if File.file?(f)
+    if recursive then
+      Find.find(directory) do |f|
+        files << f if File.file?(f)
+      end
+    else
+      files = Dir["#{directory}/*"]
     end
     files
   end

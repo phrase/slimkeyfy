@@ -70,7 +70,6 @@ end
 #YamlWriter.new("#{p}test.yaml",h).process_and_store!
 
 # -r recursives verhalten
-# key split words
 
 
 

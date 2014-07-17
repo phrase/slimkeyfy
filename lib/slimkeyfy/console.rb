@@ -74,6 +74,10 @@ class CommandLine
     opts.on_tail('-d', '--diff', 'Uses unix diff or colordiff for full file comparison') do
       @options[:diff] = true
     end
+    opts.on_tail('-r', '--recursive', 'If a directory is given all subdirectories will be walked either. 
+      Without -r and a directory just the files within the first level are walked.') do
+      @options[:recursive] = true
+    end
   end
 
   def main
@@ -83,7 +87,9 @@ class CommandLine
     helpful_exit if input.nil?
 
     if File.directory?(input) then
-      FileUtils.walk(input).each do |inp|
+      rec = @options.fetch(:recursive, false)
+      MFileUtils.walk(input, rec).each do |inp|
+        @options[:input] = inp
         translate
       end
     elsif File.file?(input) then
