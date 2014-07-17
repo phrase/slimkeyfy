@@ -103,7 +103,7 @@ class CommandLine
   def directory_translate(input)
     rec = @options.fetch(:recursive, false)
     MFileUtils.walk(input, rec).each do |rec_input|
-      if File.file?(rec_input) then
+      if File.file?(rec_input) and rec_input.end_with?(".slim") then
         @options[:input] = rec_input
         translate
       end
