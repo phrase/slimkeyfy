@@ -2,11 +2,11 @@
 class Transformer
 
   HTML_TAGS = /^(\||[a-z]+[0-9]?)/
-  STARTING_EQUALS = /([a-z]+[0-9]?[\._]?[a-z]+)/
-  HTML_STRING_PARAMETERS = /(label|hint|[a-z]\.input|[a-z]\.button|link_to|submit)/
+  HTML_STRING_PARAMETERS = /(label|hint|[a-z]\.input|[a-z]\.button|link_to|submit|title)/
 
   T_TAG = /t\(['"]\.?[a-z\_]+["']\)/
-  STRING_INTERPOLATION = /#\{(.*)\}/
+  STRING_INTERPOLATION = /["'](#\{.*\})["']/
+  STRING = /"(.*)"/
 
   def initialize(word, yaml_processor=nil)
     @word = word
@@ -19,15 +19,9 @@ class Transformer
 
     result = case tokens[0]
       when HTML_TAGS then
-        tagged_with_equals = to_equals_tag(tokens[0])
-        translation = match_string(@word.slice(1, -1)).gsub("&nbsp;", " ")
-        _, translation_key = update_hashes(translation)
-        normalize_translation(tagged_with_equals, translation_key)
+        simple_html(tokens)
       when "=" then
-        if tokens[1].match(STARTING_EQUALS) then
-          translated_arguments = html_argument_list(tokens[1..-1].join(" "))
-          normalize_translation("=", translated_arguments)
-        else nil_elem end
+        complex_html(tokens)
       else nil_elem end
 
     result
@@ -41,7 +35,22 @@ class Transformer
     [nil, nil]
   end
 
+  def simple_html(tokens)
+    tagged_with_equals = to_equals_tag(tokens[0])
+    translation = match_string(@word.slice(1, -1)).gsub("&nbsp;", " ")
+    _, translation_key = update_hashes(translation)
+    normalize_translation(tagged_with_equals, translation_key)
+  end
+
+  def complex_html(tokens)
+    if tokens[1].match(HTML_STRING_PARAMETERS) then
+      translated_arguments = html_argument_list(tokens[1..-1].join(" "))
+      normalize_translation("=", translated_arguments)
+    else nil_elem end
+  end
+
   def html_argument_list(arguments)
+    arguments = interpolation(arguments)
     raw_args = arguments.split(", ")
     raw_arg_tokens = raw_args.map{|tokens| tokens.split(" ") }
 
@@ -52,15 +61,29 @@ class Transformer
       else
         translation = tokens[1..-1].join(" ")
         if matches_string?(translation) then
-          translation = match_string(translation).gsub("&nbsp;", " ")
-          _, translation_key = update_hashes(translation)
-          tokens.join(" ").gsub(/"(.*)"/, "#{translation_key}")
+          translation = tokens[1..-1].join(" ")
+          strings(tokens, translation)
         else
           tokens.join(" ")
         end
       end
     }.join(", ")
     translated
+  end
+
+  def interpolation(arguments)
+    interpolated_match = arguments.match(STRING_INTERPOLATION) 
+    if interpolated_match != nil then
+      _, translation_key = update_hashes($1)
+      arguments = arguments.gsub(STRING_INTERPOLATION, "#{translation_key}")
+    end
+    arguments
+  end
+
+  def strings(tokens, translation)
+    plain_translation = match_string(translation).gsub("&nbsp;", " ")
+    _, translation_key = update_hashes(plain_translation)
+    tokens.join(" ").gsub(STRING, "#{translation_key}")
   end
 
   def to_equals_tag(s)
@@ -74,11 +97,11 @@ class Transformer
   end
 
   def matches_string?(translation)
-    translation.match(/"(.*)"/) != nil
+    translation.match(STRING) != nil
   end
 
   def match_string(translation)
-    translation.match(/"(.*)"/) ? $1 : translation
+    translation.match(STRING) ? $1 : translation
   end
 
   def normalize_translation(before_translation, translation)

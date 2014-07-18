@@ -7,24 +7,31 @@ describe "Transformer should transform .slim correctly" do
 
   describe "with basic html tags" do
     context "with h1 html tag" do
-      let(:word){ Word.new("  h1 Hallo Welt!", key_base) }
+      let(:word){ Word.new("  h1 Hello World!", key_base) }
       it {should == [
-        "  h1= t('.hallo_welt')", 
-        {"#{key_base}.hallo_welt" => "Hallo Welt!"}]
+        "  h1= t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
       }
     end
     context "with small html tag" do
-      let(:word){ Word.new("  small Hallo Welt!", key_base) }
+      let(:word){ Word.new("  small Hello World!", key_base) }
       it {should == [
-        "  small= t('.hallo_welt')", 
-        {"#{key_base}.hallo_welt" => "Hallo Welt!"}]
+        "  small= t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
       }
     end
     context "with pipe | slim symbol" do
-      let(:word){ Word.new("  | Hallo Welt!", key_base) }
+      let(:word){ Word.new("  | Hello World!", key_base) }
       it {should == [
-        "  = t('.hallo_welt')", 
-        {"#{key_base}.hallo_welt" => "Hallo Welt!"}]
+        "  = t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
+    context "with pipe and ampersand" do
+      let(:word){ Word.new("  | &nbsp;Hello World!", key_base) }
+      it {should == [
+        "  = t('.hello_world')", 
+        {"#{key_base}.hello_world" => " Hello World!"}]
       }
     end
   end
@@ -37,7 +44,6 @@ describe "Transformer should transform .slim correctly" do
   end
 
   describe "when line starts with equal" do
-
     context "when word contains link_to" do
       let( :raw_input ) { '= link_to "Settings", "#settings", data: { toggle: "tab" }' }
       let(:word) { Word.new(raw_input, key_base) }
@@ -53,6 +59,26 @@ describe "Transformer should transform .slim correctly" do
       }
       let(:word_translation) { {"key_base.new.max_characters"=>"Max. Characters", "key_base.new.shows_an_indicator_how"=>"Shows an indicator how..."} }
       it { should == [ translated , word_translation] }
+    end 
+
+    context "with link_to title and 'title' attribute" do
+      let( :raw_input ) { '= link_to "Add the first locale", new_project_locale_path(current_project), class: "modalized", data: {"modal-flavor" => "form"}, title: "Add Locale"' }
+      let(:word) { Word.new(raw_input, key_base) }
+      let(:translated) { 
+        "= link_to t('.add_the_first_locale'), new_project_locale_path(current_project), class: \"modalized\", data: {\"modal-flavor\" => \"form\"}, title: t('.add_locale')"
+      }
+      let(:word_translation) { {"key_base.new.add_the_first_locale"=>"Add the first locale", "key_base.new.add_locale"=>"Add Locale"} }
+      it { should == [ translated , word_translation] }
+    end
+
+    context "with interpolated string" do
+      let( :raw_input ) { '= f.input :is_plural, inline_label: "Enable pluralization for this key", hint: "#{link_to("What does that mean?", article_path(slug: "working-with-phrase/pluralization"), target: "_blank")}".html_safe' }
+      let(:word) { Word.new(raw_input, key_base) }
+      let(:translated) { 
+        '= f.input :is_plural, inline_label: t(\'.enable_pluralization_for_this\'), hint: t(\'.link_to_what\').html_safe'
+      }
+      let(:word_translation) { {"key_base.new.enable_pluralization_for_this"=>"Enable pluralization for this key", "key_base.new.link_to_what"=>'#{link_to("What does that mean?", article_path(slug: "working-with-phrase/pluralization"), target: "_blank")}'} }
+      it { should == [ translated , word_translation] }
     end
 
   end
@@ -62,8 +88,8 @@ describe "TranslationKeyBuilder" do
   subject { TranslationKeyBuilder.new(translation).generate_key_name }
 
   context "with valid translation and special characters" do
-    let( :translation ) { ":Hallo 'Welt!~" }
-    it { should ==  "hallo_welt" }
+    let( :translation ) { ":Hello 'World!~" }
+    it { should ==  "hello_world" }
   end
 
   context "with special characters only" do
