@@ -69,18 +69,18 @@ end
 class CommandLine
   def initialize(args)
     helpful_exit if ARGV.size < 1
-    @options = { :yaml_file => "config/locales/en.yml" }
+    @options = {}
     @args = args
     OptionParser.new(&method(:opt_scan)).parse!(@args)
   end
 
   def helpful_exit
-    puts "Please provide at least a path. See -h for more information."
+    puts "Please provide a path to .slims and a yaml localization file. See -h for more information."
     exit
   end
 
   def opt_scan(opts)
-    opts.banner = "Usage: slimkeyfy INPUT_FILENAME_OR_DIRECTORY [OUTPUT_FILENAME_OR_DIRECTORY] [Options]"
+    opts.banner = "Usage: slimkeyfy INPUT_FILENAME_OR_DIRECTORY [LOCALIZATION_YAML_FILE] [Options]"
     opts.on_tail('-h', '--help', 'Show this message') do
       puts opts
       exit
@@ -92,16 +92,13 @@ class CommandLine
       Without -r and a directory just the files within the first level are walked.') do
       @options[:recursive] = true
     end
-    opts.on("-y", "--yaml path_to_yaml", 'Give a path to the specific yaml Locale you would like to translate') do |path_to_yaml|
-      @options[:yaml_file] = path_to_yaml
-    end
   end
 
   def main
     @options[:input] = input = @args.shift
-    @options[:output] = output = @args.shift
+    @options[:yaml_file] = yaml_file = @args.shift
 
-    helpful_exit if input.nil?
+    helpful_exit if (input.nil? or yaml_file.nil?)
     puts "yaml file=#{@options[:yaml_file]}"
 
     if File.directory?(input) then

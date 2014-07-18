@@ -16,18 +16,9 @@ class MFileUtils
     backup_path
   end
   def self.create_new_file(options)
-    new_file_path = build_new_file_path(options)
+    new_file_path = self.abs_path(options[:input])
     FileWriter.overwrite(new_file_path)
     new_file_path
-  end
-
-  def self.build_new_file_path(options)
-    out = options[:output]
-    if out and File.file?(out) then
-      self.abs_path(out)
-    else
-      self.abs_path(options[:input])
-    end
   end
   def self.abs_path(file)
     File.absolute_path(file)
