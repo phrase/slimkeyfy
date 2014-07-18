@@ -49,8 +49,8 @@ class IOAction
       self.yes_or_no?(msg)
     end
   end
-  def self.yes_no_or_tag(msg)
-    puts "#{msg} (y|n|x)"
+  def self.choose(msg)
+    puts "#{msg} (y|n) (x for tagging | (a)bort)"
     arg = STDIN.gets.chomp
     if arg =~ /[yY](es)?/ then
       "y"
@@ -58,9 +58,11 @@ class IOAction
       "n"
     elsif arg =~ /x/ then
       "x"
+    elsif arg =~ /a/ then
+      "a"
     else
-      puts "Provide either (y)es, (n)o or x for tagging!"
-      self.yes_no_or_maybe(msg)
+      puts "Either (y)es, (n)o, (x) for tagging or (a) to abort"
+      self.choose(msg)
     end
   end
 end
@@ -98,7 +100,7 @@ class CommandLine
     @options[:input] = input = @args.shift
     @options[:yaml_file] = yaml_file = @args.shift
 
-    helpful_exit if (input.nil? or yaml_file.nil?)
+    helpful_exit if input.nil?
     puts "yaml file=#{@options[:yaml_file]}"
 
     if File.directory?(input) then

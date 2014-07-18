@@ -5,7 +5,7 @@ class TranslateSlim
     @bak_path = MFileUtils.backup(@original_file_path)
     @content = FileReader.read(@bak_path).split("\n")
     @file_path = MFileUtils.create_new_file(@original_file_path)
-    @yaml_processor = YamlProcessor.new(options[:yaml_file])
+    @yaml_processor = options[:yaml_file] ? YamlProcessor.new(options[:yaml_file]) : nil
     @key_base = generate_key_base
     @new_content = []
     @changes = false
@@ -16,7 +16,7 @@ class TranslateSlim
       word = Word.new(old_line, @key_base)
       new_line, translations = Transformer.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
-        @yaml_processor.delete_translations(translations)
+        delete_translations(translations)
         @new_content << old_line
       else
         @new_content << new_line
@@ -37,7 +37,7 @@ class TranslateSlim
       word = Word.new(old_line, @key_base)
       new_line, translations = Transformer.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
-        @yaml_processor.delete_translations(translations)
+        delete_translations(translations)
         update_with(idx, old_line)
       else
         process_new_line(idx, old_line, new_line, translations)
@@ -50,14 +50,18 @@ class TranslateSlim
 
   def process_new_line(idx, old_line, new_line, translations)
     ConsolePrinter.difference(old_line, new_line, translations)
-    case IOAction.yes_no_or_tag("Changes wanted?")
+    case IOAction.choose("Changes wanted?")
       when "y" then update_with(idx, new_line)
       when "n" then 
         update_with(idx, old_line)
-        @yaml_processor.delete_translations(translations)
+        delete_translations(translations)
       when "x" then 
         update_with(idx, tag(old_line, translations))
-        @yaml_processor.delete_translations(translations)
+        delete_translations(translations)
+      when "a" then
+        MFileUtils.restore(@bak_path, @original_file_path)
+        puts "Aborted!"
+        exit
     end
   end
 
@@ -70,11 +74,11 @@ class TranslateSlim
     begin
       if @changes then
         if IOAction.yes_or_no?("Do you like what you see?") then
-          @yaml_processor.store!
+          @yaml_processor.store! unless @yaml_processor.nil?
           puts "Processed!"
         else
           MFileUtils.restore(@bak_path, @original_file_path)
-          @yaml_processor.restore
+          @yaml_processor.restore unless @yaml_processor.nil?
           puts "Restored!"
         end
       else 
@@ -99,6 +103,11 @@ class TranslateSlim
     fname = MFileUtils.filename(@original_file_path)
     dir = MFileUtils.subdir_name(@original_file_path)
     "#{dir}.#{fname}"
+  end
+
+  def delete_translations(translations)
+    return if @yaml_processor.nil?
+    @yaml_processor.delete_translations(translations)
   end
 end
 
