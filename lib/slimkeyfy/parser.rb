@@ -8,9 +8,9 @@ class Transformer
   T_TAG = /t\(['"]\.?[a-z\_]+["']\)/
   STRING_INTERPOLATION = /#\{(.*)\}/
 
-  def initialize(word, translation_hash)
+  def initialize(word, yaml_processor=nil)
     @word = word
-    @translation_hash = translation_hash
+    @yaml_processor = yaml_processor
   end
 
   def transform
@@ -21,7 +21,7 @@ class Transformer
       when HTML_TAGS then
         tagged_with_equals = to_equals_tag(tokens[0])
         translation = match_string(@word.slice(1, -1)).gsub("&nbsp;", " ")
-        @translation_hash, _, translation_key = update_hashes(translation)
+        _, translation_key = update_hashes(translation)
         normalize_translation(tagged_with_equals, translation_key)
       when "=" then
         if tokens[1].match(STARTING_EQUALS) then
@@ -29,6 +29,7 @@ class Transformer
           normalize_translation("=", translated_arguments)
         else nil_elem end
       else nil_elem end
+
     result
   end
 
@@ -37,7 +38,7 @@ class Transformer
   end
 
   def nil_elem
-    [@translation_hash, nil, nil]
+    [nil, nil]
   end
 
   def html_argument_list(arguments)
@@ -52,7 +53,7 @@ class Transformer
         translation = tokens[1..-1].join(" ")
         if matches_string?(translation) then
           translation = match_string(translation).gsub("&nbsp;", " ")
-          @translation_hash, _, translation_key = update_hashes(translation)
+          _, translation_key = update_hashes(translation)
           tokens.join(" ").gsub(/"(.*)"/, "#{translation_key}")
         else
           tokens.join(" ")
@@ -81,11 +82,11 @@ class Transformer
   end
 
   def normalize_translation(before_translation, translation)
-    [@translation_hash, "#{@word.indentation}#{before_translation} #{translation}", @word.translations]
+    ["#{@word.indentation}#{before_translation} #{translation}", @word.translations]
   end
 
   def update_hashes(translation)
-    @word.update_translation_key_hash(@translation_hash, translation)
+    @word.update_translation_key_hash(@yaml_processor, translation)
   end
 end
 
@@ -125,12 +126,16 @@ class Word
     "t('.#{translation_key}')"
   end
 
-  def update_translation_key_hash(all_translations, translation)
-    translation_key_without_base = TranslationKeyBuilder.new(translation).generate_key_name
-    translation_key = "#{@key_base}.#{translation_key_without_base}"
-    all_translations, translation_key, translation = Merger.merge_single_translation(all_translations, translation_key, translation)
+  def update_translation_key_hash(yaml_processor, translation)
+    translation_key_without_base, translation_key = create_translation_keys(translation)
+    translation_key, translation = yaml_processor.merge!(translation_key, translation) unless yaml_processor.nil?
     @translations.merge!({translation_key => translation})
-    [all_translations, translation, i18nString(translation_key_without_base)]
+    [translation, i18nString(translation_key_without_base)]
+  end
+
+  def create_translation_keys(translation)
+    translation_key_without_base = TranslationKeyBuilder.new(translation).generate_key_name
+    [translation_key_without_base, "#{@key_base}.#{translation_key_without_base}"]
   end
 end
 

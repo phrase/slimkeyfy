@@ -49,7 +49,7 @@ class IOAction
       self.yes_or_no?(msg)
     end
   end
-  def self.yes_no_or_maybe(msg)
+  def self.yes_no_or_tag(msg)
     puts "#{msg} (y|n|x)"
     arg = STDIN.gets.chomp
     if arg =~ /[yY](es)?/ then

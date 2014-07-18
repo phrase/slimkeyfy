@@ -9,14 +9,24 @@ class YamlProcessor
     @yaml_file_path = yaml_file_path
     @original_yaml_hash = YAML::load_file(@yaml_file_path)
     @locale = extract_locale
+    @translation_hash = yaml_hash
   end
 
   def yaml_hash
     @original_yaml_hash[@locale]
   end
 
-  def store!(merged_yaml_hash)
-    merged = {@locale => merged_yaml_hash}
+  def delete_translations(translations)
+    return if translations.nil?
+    translations.each do |k, v|
+      path = k.split('.')
+      leaf = path.pop
+      path.inject(@translation_hash){|h, el| h[el]}.delete(leaf)
+    end
+  end
+
+  def store!
+    merged = {@locale => @translation_hash}
     FileWriter.write(@yaml_file_path, merged.to_yaml)
   end
 
@@ -26,6 +36,11 @@ class YamlProcessor
 
   def extract_locale
     File.basename(@yaml_file_path).split(".")[1]
+  end
+
+  def merge!(translation_key, translation)
+    @translation_hash, translation_key, translation = Merger.merge_single_translation(@translation_hash, translation_key, translation)
+    [translation_key, translation]
   end
 end
 

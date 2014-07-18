@@ -15,8 +15,8 @@ class MFileUtils
     FileUtils.cp(original_file_path, backup_path)
     backup_path
   end
-  def self.create_new_file(options)
-    new_file_path = self.abs_path(options[:input])
+  def self.create_new_file(input)
+    new_file_path = self.abs_path(input)
     FileWriter.overwrite(new_file_path)
     new_file_path
   end
@@ -35,6 +35,16 @@ class MFileUtils
     end
     files
   end
+  def self.filename(file_path)
+    return "" if file_path.nil?
+    fname = File.basename(file_path, ".html.slim")
+    fname = fname[1..-1] if fname.start_with?("_")
+    fname
+  end
+  def self.subdir_name(file_path)
+    return "" if file_path.nil?
+    file_path.split("/")[-2]
+  end
 end
 
 class FileReader
@@ -52,19 +62,5 @@ class FileWriter
   end
   def self.append(full_path, content)
     open(full_path, 'a') { |f| f.puts content}
-  end
-  def self.create_temporary_file(file)
-    "#{File.dirname(file)}/translated_#{file_basename(file)}.html.slim"
-  end
-  def self.file_basename(file)
-    return "" if file.nil?
-    fname = File.basename(file).split(".").first
-    if fname.start_with? "_"
-      fname = fname[1..-1]
-    end
-    fname
-  end
-  def self.subdir_name(file_path)
-    file_path.split("/")[-2]
   end
 end

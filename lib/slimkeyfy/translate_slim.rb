@@ -1,24 +1,22 @@
 class TranslateSlim
 
   def initialize(options={})
-    @options = options
-    @original_file_path = @options[:input]
+    @original_file_path = options[:input]
     @bak_path = MFileUtils.backup(@original_file_path)
     @content = FileReader.read(@bak_path).split("\n")
-    @file_path = MFileUtils.create_new_file(@options)
+    @file_path = MFileUtils.create_new_file(@original_file_path)
     @yaml_processor = YamlProcessor.new(options[:yaml_file])
-    @new_content = []
-    @translation_hash = @yaml_processor.yaml_hash
     @key_base = generate_key_base
+    @new_content = []
     @changes = false
   end
 
   def unix_diff_mode
     @content.each do |old_line|
       word = Word.new(old_line, @key_base)
-      @translation_hash, new_line, translations = Transformer.new(word, @translation_hash).transform
+      new_line, translations = Transformer.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
-        delete_invalid_translations(translations)
+        @yaml_processor.delete_translations(translations)
         @new_content << old_line
       else
         @new_content << new_line
@@ -37,9 +35,9 @@ class TranslateSlim
   def stream_mode
     @content.each_with_index do |old_line, idx|
       word = Word.new(old_line, @key_base)
-      @translation_hash, new_line, translations = Transformer.new(word, @translation_hash).transform
+      new_line, translations = Transformer.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
-        delete_invalid_translations(translations)
+        @yaml_processor.delete_translations(translations)
         update_with(idx, old_line)
       else
         process_new_line(idx, old_line, new_line, translations)
@@ -52,14 +50,14 @@ class TranslateSlim
 
   def process_new_line(idx, old_line, new_line, translations)
     ConsolePrinter.difference(old_line, new_line, translations)
-    case IOAction.yes_no_or_maybe("Changes wanted?")
+    case IOAction.yes_no_or_tag("Changes wanted?")
       when "y" then update_with(idx, new_line)
       when "n" then 
         update_with(idx, old_line)
-        delete_invalid_translations(translations)
+        @yaml_processor.delete_translations(translations)
       when "x" then 
         update_with(idx, tag(old_line, translations))
-        delete_invalid_translations(translations)
+        @yaml_processor.delete_translations(translations)
     end
   end
 
@@ -72,7 +70,7 @@ class TranslateSlim
     begin
       if @changes then
         if IOAction.yes_or_no?("Do you like what you see?") then
-          @yaml_processor.store!(@translation_hash)
+          @yaml_processor.store!
           puts "Processed!"
         else
           MFileUtils.restore(@bak_path, @original_file_path)
@@ -97,19 +95,9 @@ class TranslateSlim
     translations.nil? or translations.empty?
   end
 
-  def delete_invalid_translations(translations)
-    return if translations.nil?
-    translations.each do |k, v|
-      path = k.split('.')
-      leaf = path.pop
-      path.inject(@translation_hash){|h, el| h[el]}.delete(leaf)
-    end
-  end
-
   def generate_key_base
-    fname = File.basename(@original_file_path, ".html.slim")
-    fname = fname[1..-1] if fname.start_with?("_")
-    dir = File.dirname(@original_file_path).split("/")[-1]
+    fname = MFileUtils.filename(@original_file_path)
+    dir = MFileUtils.subdir_name(@original_file_path)
     "#{dir}.#{fname}"
   end
 end
