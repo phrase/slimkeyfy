@@ -16,10 +16,11 @@ h1= t('.hello_world')
 Install
 ------
 ```unix
-    git clone https://github.com/phrase/slimkeyfy.git 
-    cd slimkeyfy
-    gem build slimkeyfy.gemspec
-    gem install slimkeyfy-0.0.2.gem
+git clone https://github.com/phrase/slimkeyfy.git 
+cd slimkeyfy
+gem build slimkeyfy.gemspec
+gem install slimkeyfy-0.0.2.gem
+# Later: gem install slimkeyfy
 ```
 Usage
 -----
@@ -37,7 +38,7 @@ unix_diff with -d --diff
 ```unix
 slimkeyfy path/to/your/file.html.slim path/to/your/locale.yml --diff
 ```
-recursively with through all files from a given dir -r --recursive
+recursively walks through all files from a given dir -r --recursive
 ```unix
 slimkeyfy path/to/your/dir/ path/to/your/locale.yml --diff --recursive
 ```
@@ -54,31 +55,31 @@ Testing
 To test the application simply call rspec spec/.. from the root directory of slimkeyfy
 
 ```unix
-    bundle install
-    bundle exec rspec spec/
+bundle install
+bundle exec rspec spec/
 ```
 
 Example USAGE
 -------------
 ```unix
 your_app_name/
-    |- app/
-        |- views/
-            |- user/
-                new.html.slim
-                show.html.slim
-            |- project/
-                index.html.slim
-            ...
+  |- app/
+    |- views/
+      |- user/
+        new.html.slim
+        show.html.slim
+      |- project/
+        index.html.slim
         ...
-    |- config/
-        |- locales/
-            en.yml
-            ...
     ...
+  |- config/
+    |- locales/
+      en.yml
+      ...
+  ...
 
 > pwd
- ../your_app_name/
+../your_app_name/
  
 > slimkeyfy app/views/user/ config/locales/en.yml
 ... your changes here (y/n/x)
@@ -93,33 +94,33 @@ your_app_name/
     en.yml
     en.yml.bak
     
- > cat ../user/new.html.slim.bak
- h1 Hello World!
+> cat ../user/new.html.slim.bak
+  h1 Hello World!
     
- > cat ../user/new.html.slim
- h1= t('.hello_world')
+> cat ../user/new.html.slim
+  h1= t('.hello_world')
  
- > cat config/locales/en.yml.bak
- --
- en:
-   keys..
+> cat config/locales/en.yml.bak
+  --
+  en:
+    keys..
           
- > cat config/locales/en.yml
- --
- en:
-   keys..
-   user:
-     new:
-       hello_world: Hello World!
-     show:
-       ...
+> cat config/locales/en.yml
+  --
+  en:
+    keys..
+    user:
+      new:
+        hello_world: Hello World!
+      show:
+        ...
 ```
 Issues
 ------
 
 1. Recursively updating can be dangerous as there are moments (ctrl + c) where you can corrupt a file. Normally this only affects the file currently processed. Also the localization.yml can get out of sync.
 2. If you choose to take a lot of files at one time make sure to go through with it. It is not an issue to completely rerun everything (already translated strings are ignored) but should be avoided.
-3. The matching of some html is still imperfect. As a result you will encounter lines that do not need to be translated therefore encouring the stream mode (default) for now.
+3. The matching of some html is still imperfect. As a result you will encounter lines that do not need to be translated. I therefore encourage using the stream mode (default).
 
 
 
