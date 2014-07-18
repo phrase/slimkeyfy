@@ -38,7 +38,7 @@ class Transformer
   def simple_html(tokens)
     tagged_with_equals = to_equals_tag(tokens[0])
     translation = match_string(@word.slice(1, -1)).gsub("&nbsp;", " ")
-    _, translation_key = update_hashes(translation)
+    translation_key = update_hashes(translation)
     normalize_translation(tagged_with_equals, translation_key)
   end
 
@@ -74,7 +74,7 @@ class Transformer
   def interpolation(arguments)
     interpolated_match = arguments.match(STRING_INTERPOLATION) 
     if interpolated_match != nil then
-      _, translation_key = update_hashes($1)
+      translation_key = update_hashes($1)
       arguments = arguments.gsub(STRING_INTERPOLATION, "#{translation_key}")
     end
     arguments
@@ -82,7 +82,7 @@ class Transformer
 
   def strings(tokens, translation)
     plain_translation = match_string(translation).gsub("&nbsp;", " ")
-    _, translation_key = update_hashes(plain_translation)
+    translation_key = update_hashes(plain_translation)
     tokens.join(" ").gsub(STRING, "#{translation_key}")
   end
 
@@ -153,7 +153,7 @@ class Word
     translation_key_without_base, translation_key = create_translation_keys(translation)
     translation_key, translation = yaml_processor.merge!(translation_key, translation) unless yaml_processor.nil?
     @translations.merge!({translation_key => translation})
-    [translation, i18nString(translation_key_without_base)]
+    i18nString(translation_key_without_base)
   end
 
   def create_translation_keys(translation)

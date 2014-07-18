@@ -24,9 +24,12 @@ gem install slimkeyfy-0.0.2.gem
 ```
 Usage
 -----
+```unix
+slimkeyfy INPUT_FILENAME_OR_DIRECTORY [LOCALIZATION_YAML_FILE] [Options]
+```
 Two modes are supported:
 
-1. **Stream** - default mode, walks through the given file and if an untagged plain string is found you are prompted to apply (y)es discard (n)o or to tag (x) if you would like it to be marked for later (like a git conflict).
+1. **Stream** - default mode, walks through the given file and if an untagged plain string is found you are prompted to apply (y)es, discard (n)o, tag (x) if you would like it to be marked for later (like a git conflict) or to (a)bort (only aborts the current file process).
 
 2. **Diff** - currently not recommended in recursive mode. Applies all changes and uses colordiff or diff to show any changes between the files. Faster if you do not like to approve every single matching line. Also more error prone
 
@@ -121,7 +124,3 @@ Issues
 1. Recursively updating can be dangerous as there are moments (ctrl + c) where you can corrupt a file. Normally this only affects the file currently processed. Also the localization.yml can get out of sync.
 2. If you choose to take a lot of files at one time make sure to go through with it. It is not an issue to completely rerun everything (already translated strings are ignored) but should be avoided.
 3. The matching of some html is still imperfect. As a result you will encounter lines that do not need to be translated. I therefore encourage using the stream mode (default).
-
-
-
-
