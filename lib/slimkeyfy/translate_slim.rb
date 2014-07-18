@@ -9,12 +9,13 @@ class TranslateSlim
     @yaml_processor = YamlProcessor.new(options[:yaml_file])
     @new_content = []
     @translation_hash = @yaml_processor.yaml_hash
+    @key_base = generate_key_base
     @changes = false
   end
 
   def unix_diff_mode
     @content.each do |old_line|
-      word = Word.new(old_line)
+      word = Word.new(old_line, @key_base)
       @translation_hash, new_line, translations = Transformer.new(word, @translation_hash).transform
       if translations_are_invalid?(translations)
         delete_invalid_translations(translations)
@@ -35,7 +36,7 @@ class TranslateSlim
 
   def stream_mode
     @content.each_with_index do |old_line, idx|
-      word = Word.new(old_line)
+      word = Word.new(old_line, @key_base)
       @translation_hash, new_line, translations = Transformer.new(word, @translation_hash).transform
       if translations_are_invalid?(translations)
         delete_invalid_translations(translations)
@@ -53,14 +54,18 @@ class TranslateSlim
     ConsolePrinter.difference(old_line, new_line, translations)
     case IOAction.yes_no_or_maybe("Changes wanted?")
       when "y" then update_with(idx, new_line)
-      when "n" then update_with(idx, old_line)
-      when "x" then update_with(idx, tag(old_line, new_line))
+      when "n" then 
+        update_with(idx, old_line)
+        delete_invalid_translations(translations)
+      when "x" then 
+        update_with(idx, tag(old_line, translations))
+        delete_invalid_translations(translations)
     end
   end
 
-  def tag(old_line, new_line)
+  def tag(old_line, translations)
     delim = "<#{"="*50}>"
-    "#{delim}\n#{old_line}\n#{new_line}\n#{delim}"
+    "#{delim}\n#{old_line}\n#{translations}\n#{delim}"
   end
 
   def finalize!
@@ -75,6 +80,7 @@ class TranslateSlim
           puts "Restored!"
         end
       else 
+        MFileUtils.restore(@bak_path, @original_file_path)
         puts "Nothing was changed!" 
       end
     rescue SystemExit, Interrupt
@@ -93,7 +99,18 @@ class TranslateSlim
 
   def delete_invalid_translations(translations)
     return if translations.nil?
-    translations.keys.each{|k| @translation_hash.delete(k)}
+    translations.each do |k, v|
+      path = k.split('.')
+      leaf = path.pop
+      path.inject(@translation_hash){|h, el| h[el]}.delete(leaf)
+    end
+  end
+
+  def generate_key_base
+    fname = File.basename(@original_file_path, ".html.slim")
+    fname = fname[1..-1] if fname.start_with?("_")
+    dir = File.dirname(@original_file_path).split("/")[-1]
+    "#{dir}.#{fname}"
   end
 end
 

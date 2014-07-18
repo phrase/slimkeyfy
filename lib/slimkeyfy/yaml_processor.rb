@@ -31,33 +31,52 @@ end
 
 class Merger
   def self.merge_hashes(old_translations, new_translations)
-    old_translations.merge(new_translations)
+    new_translations.each do |k, v|
+      merge_single_translation(old_translations, new_translations)
+    end
   end
 
   def self.merge_single_translation(translations, translation_key, translation)
-    k, v = translation_key, translation
-    if translations.has_key?(k) then
-      if translations[k] != v then
-        num = 1
-        k = "#{translation_key}#{num}"
-        while translations.has_key?(k) do
-          k = "#{translation_key}#{num}"
-          num += 1
-        end
-        translations[k] = v
-      else
-        translations[k] = v
-      end
-    else
-      translations.each do |k1, v1|
-        if v1 == v then
-          return [translations, k1, v] 
-        end
-      end
-      translations[k] = v
+    k = translation_key
+    dir, file, name = k.split(".")
+    value = multi_key_name(translations, k)
+    if value != nil and value != translation then
+      name = enhance_key_on_collision(translations, name)
     end
-    [translations, k, v]
-  end 
+    h = triple_key_to_hash(dir, file, name, translation)
+    translations = translations.deep_merge(h)
+    k = "#{dir}.#{file}.#{name}"
+    [translations, k, translation]
+  end
+
+  def self.enhance_key_on_collision(translations, translation_key_name)
+    num = 1
+    k = "#{translation_key_name}_#{num}"
+    while translations.has_key?(k) do
+      k = "#{translation_key_name}_#{num}"
+      num += 1
+    end
+    k
+  end
+
+  def self.triple_key_to_hash(dir, file, name, translation)
+    {dir => {file => {name => translation}}}
+  end
+
+  def self.multi_key_name(h, key)
+    dir, file, name = key.split(".")
+    if h[dir] and h[dir][file] then
+      return h[dir][file][name]
+    end
+    nil
+  end
+end
+
+class Hash
+    def deep_merge(second)
+        merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
+        self.merge(second, &merger)
+    end
 end
 
 

@@ -4,7 +4,9 @@ class Transformer
   HTML_TAGS = /^(\||[a-z]+[0-9]?)/
   STARTING_EQUALS = /([a-z]+[0-9]?[\._]?[a-z]+)/
   HTML_STRING_PARAMETERS = /(label|hint|[a-z]\.input|[a-z]\.button|link_to|submit)/
-  T_TAG = /t\(['"][a-z\_]+["']\)/
+
+  T_TAG = /t\(['"]\.?[a-z\_]+["']\)/
+  STRING_INTERPOLATION = /#\{(.*)\}/
 
   def initialize(word, translation_hash)
     @word = word
@@ -27,7 +29,6 @@ class Transformer
           normalize_translation("=", translated_arguments)
         else nil_elem end
       else nil_elem end
-
     result
   end
 
@@ -93,8 +94,9 @@ class Word
   attr_reader :line, :tokens, :indentation
   attr_accessor :translations
 
-  def initialize(line)
+  def initialize(line, key_base)
     @line = escape(line)
+    @key_base = key_base
     @indentation = " " * (@line.size - unindented_line.size)
     @translations = {}
   end
@@ -120,14 +122,15 @@ class Word
   end
 
   def i18nString(translation_key)
-    "t('#{translation_key}')"
+    "t('.#{translation_key}')"
   end
 
   def update_translation_key_hash(all_translations, translation)
-    translation_key = TranslationKeyBuilder.new(translation).generate_key_name
+    translation_key_without_base = TranslationKeyBuilder.new(translation).generate_key_name
+    translation_key = "#{@key_base}.#{translation_key_without_base}"
     all_translations, translation_key, translation = Merger.merge_single_translation(all_translations, translation_key, translation)
     @translations.merge!({translation_key => translation})
-    [all_translations, translation, i18nString(translation_key)]
+    [all_translations, translation, i18nString(translation_key_without_base)]
   end
 end
 
