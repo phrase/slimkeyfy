@@ -67,7 +67,11 @@ class TranslateSlim
 
   def tag(old_line, translations)
     delim = "<#{"="*50}>"
-    "#{delim}\n#{old_line}\n#{translations}\n#{delim}"
+    temp = translations.map{ |k, v| 
+      dir, file, name = k.split(".")
+      "#{dir}.#{file} | #{name}: #{v} | t('.#{name}')\n"
+    }
+    "#{delim}\n#{old_line}\n#{temp}\n#{delim}"
   end
 
   def finalize!
