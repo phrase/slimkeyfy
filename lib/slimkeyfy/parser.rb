@@ -4,18 +4,22 @@ class Transformer
   HTML_TAGS = /^(\||[a-z]+[0-9]?)/
   T_TAG = /t\(['"]\.?[a-z\_]+["']\)/
   STRING = /"(.*)"/
-  SLIM = {
-    hint: /(?<before>.*)(?<hint>hint:\s*)"(?<translation>.*)"/,
-    link_to: /(?<before>.*)(?<link_to>link_to(\s[a-z]*)?\(?)"(?<translation>.*?)",(?<after>.*)/,
-    placeholder: /(?<before>.*)(?<placeholder>placeholder:\s*)"(?<translation>.*?)"(?<after>,?.*)?/,
-    title: /(?<before>.*)(?<title>title:\s*)"(?<translation>.*?)"(?<after>,?.*)?/,
-    label: /(?<before>.*)(?<label>[a-z]*_?label:\s*)"(?<translation>.*?)"(?<after>,?.*)?/,
-    tag: /(?<before>.*)(?<tag>[a-z]+_tag:?\s*)"(?<translation>.*?)",(?<after>.*)/,
-    input: /(?<before>.*)(?<input>[a-z]*[\._]input:?\s*)['"](?<translation>.*?)['"],(?<after>.*)/,
-    button: /(?<before>.*)(?<button>[a-z]*[\._]button:?\s*)['"](?<translation>.*?)['"],(?<after>.*)/,
+
+  BEFORE = /(?<before>.*)/
+  TRANSLATION = /['"](?<translation>.*?)['"]/
+  AFTER = /(?<after>,?.*)?/
+
+  HTML_ARGUMENTS = {
+    hint: /#{BEFORE}(?<html_tag>hint:\s*)["'](?<translation>.*)["']/,
+    link_to: /#{BEFORE}(?<html_tag>link_to(\s[a-z]*)?\(?)#{TRANSLATION}#{AFTER}/,
+    placeholder: /#{BEFORE}(?<html_tag>placeholder:\s*)#{TRANSLATION}#{AFTER}/,
+    title: /#{BEFORE}(?<html_tag>title:\s*)#{TRANSLATION}#{AFTER}/,
+    label: /#{BEFORE}(?<html_tag>[a-z]*_?label:\s*)#{TRANSLATION}#{AFTER}/,
+    tag_input_button: /#{BEFORE}(?<html_tag>[a-z]*[\._]?(button|input|tag):?\s*)#{TRANSLATION}#{AFTER}/,
   }
+
   def match_any_slim?(line)
-    SLIM.values.any?{ |regex| line.match(regex) }
+    HTML_ARGUMENTS.values.any?{ |regex| line.match(regex) }
   end
 
   def initialize(word, yaml_processor=nil)
@@ -26,13 +30,14 @@ class Transformer
   def transform
     tokens = @word.as_list
     unindented_line = @word.unindented_line
+
     return nil_elem if should_not_be_processed?(tokens)
 
     result = 
-    if tokens[0].match(HTML_TAGS) then
-      simple_html(tokens)
-    elsif match_any_slim?(unindented_line) then
+    if match_any_slim?(unindented_line) then
       complex_html(unindented_line)
+    elsif tokens[0].match(HTML_TAGS) then
+      simple_html(tokens)
     else nil_elem end
 
     result
@@ -54,95 +59,22 @@ class Transformer
   end
 
   def complex_html(line)
-    line = hint(line)
-    line = link_to(line)
-    line = placeholder(line)
-    line = title(line)
-    line = label(line)
-    line = tag(line)
-    line = input(line)
-    line = button(line)
+    line = parse_html_arguments(line)
     normalize_translation(line)
   end
 
-  def hint(s)
-    m_data = s.match(SLIM[:hint])
-    if m_data != nil then
-      before, hint, translation = m_data[:before], m_data[:hint], m_data[:translation]
-      translation_key = update_hashes(translation)
-      s = "#{before}#{hint}#{translation_key}"
+  def parse_html_arguments(line)
+    HTML_ARGUMENTS.each do |key, regex|
+      m_data = nil
+      m_data = line.match(regex)
+      if m_data != nil then
+        before, html_tag, translation = m_data[:before], m_data[:html_tag], m_data[:translation]
+        after = m_data.names.include?("after") ? m_data[:after] : ""
+        translation_key = update_hashes(translation)
+        line = "#{before}#{html_tag}#{translation_key}#{after}"
+      end
     end
-    s
-  end
-
-  def link_to(s)
-    m_data = s.match(SLIM[:link_to])
-    if m_data != nil then
-      before, link_to, translation, after = m_data[:before], m_data[:link_to], m_data[:translation], m_data[:after]
-      translation_key = update_hashes(translation)
-      s = "#{before}#{link_to}#{translation_key},#{after}"
-    end
-    s
-  end
-
-  def placeholder(s)
-    m_data = s.match(SLIM[:placeholder])
-    if m_data != nil then
-      before, placeholder, translation, after = m_data[:before], m_data[:placeholder], m_data[:translation], m_data[:after]
-      translation_key = update_hashes(translation)
-      s = "#{before}#{placeholder}#{translation_key}#{after}"
-    end
-    s
-  end
-
-  def title(s)
-    m_data = s.match(SLIM[:title])
-    if m_data != nil then
-      before, title, translation, after = m_data[:before], m_data[:title], m_data[:translation], m_data[:after]
-      translation_key = update_hashes(translation)
-      s = "#{before}#{title}#{translation_key}#{after}"
-    end
-    s
-  end
-
-  def label(s)
-    m_data = s.match(SLIM[:label])
-    if m_data != nil then
-      before, label, translation, after = m_data[:before], m_data[:label], m_data[:translation], m_data[:after]
-      translation_key = update_hashes(translation)
-      s = "#{before}#{label}#{translation_key}#{after}"
-    end
-    s
-  end
-
-  def tag(s)
-    m_data = s.match(SLIM[:tag])
-    if m_data != nil then
-      before, tag, translation, after = m_data[:before], m_data[:tag], m_data[:translation], m_data[:after]
-      translation_key = update_hashes(translation)
-      s = "#{before}#{tag}#{translation_key},#{after}"
-    end
-    s
-  end
-
-  def input(s)
-    m_data = s.match(SLIM[:input])
-    if m_data != nil then
-      before, input, translation, after = m_data[:before], m_data[:input], m_data[:translation], m_data[:after]
-      translation_key = update_hashes(translation)
-      s = "#{before}#{input}#{translation_key},#{after}"
-    end
-    s
-  end
-
-  def button(s)
-    m_data = s.match(SLIM[:button])
-    if m_data != nil then
-      before, button, translation, after = m_data[:before], m_data[:button], m_data[:translation], m_data[:after]
-      translation_key = update_hashes(translation)
-      s = "#{before}#{button}#{translation_key},#{after}"
-    end
-    s
+    line
   end
 
   def strings(tokens, translation)
