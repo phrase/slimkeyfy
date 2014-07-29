@@ -82,7 +82,7 @@ class CommandLine
   end
 
   def opt_scan(opts)
-    opts.banner = "Usage: slimkeyfy INPUT_FILENAME_OR_DIRECTORY [LOCALIZATION_YAML_FILE] [Options]"
+    opts.banner = "Usage: slimkeyfy INPUT_FILENAME_OR_DIRECTORY [LOCALIZATION_YAML_FILE] [LOCALE e.g. en, fr] [Options]"
     opts.on_tail('-h', '--help', 'Show this message') do
       puts opts
       exit
@@ -99,8 +99,9 @@ class CommandLine
   def main
     @options[:input] = input = @args.shift
     @options[:yaml_file] = yaml_file = @args.shift
+    @options[:locale] = @args.shift
 
-    helpful_exit if input.nil?
+    helpful_exit if input.nil? 
     puts "yaml file=#{@options[:yaml_file]}"
 
     if File.directory?(input) then

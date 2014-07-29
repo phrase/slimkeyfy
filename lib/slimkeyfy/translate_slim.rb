@@ -5,10 +5,14 @@ class TranslateSlim
     @bak_path = MFileUtils.backup(@original_file_path)
     @content = FileReader.read(@bak_path).split("\n")
     @file_path = MFileUtils.create_new_file(@original_file_path)
-    @yaml_processor = options[:yaml_file] ? YamlProcessor.new(options[:yaml_file]) : nil
+    @yaml_processor = create_yaml_processor(options)
     @key_base = generate_key_base
     @new_content = []
     @changes = false
+  end
+
+  def create_yaml_processor(options)
+    options[:yaml_file] ? YamlProcessor.new(options[:yaml_file], options[:locale]) : nil
   end
 
   def unix_diff_mode

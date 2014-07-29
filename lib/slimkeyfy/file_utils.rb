@@ -35,15 +35,18 @@ class MFileUtils
     end
     files
   end
-  def self.filename(file_path)
+  def self.filename(file_path, file_extension=".html.slim")
     return "" if file_path.nil?
-    fname = File.basename(file_path, ".html.slim")
+    fname = File.basename(file_path, file_extension)
     fname = fname[1..-1] if fname.start_with?("_")
     fname
   end
-  def self.subdir_name(file_path)
+  def self.subdir_name(file_path, view_folder="views")
     return "" if file_path.nil?
-    file_path.split("/")[-2]
+    dirs = file_path.split("/").drop_while{|e| e != view_folder}
+    return "" if dirs.empty?
+    strip_dirs_and_file = dirs.pop(dirs.size-1)
+    strip_dirs_and_file[0..-2].join(".")
   end
 end
 

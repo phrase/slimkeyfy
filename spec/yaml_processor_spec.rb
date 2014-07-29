@@ -1,9 +1,11 @@
 require_relative '../lib/slimkeyfy/yaml_processor'
-
+require_relative '../lib/slimkeyfy/file_utils'
 
 describe "yaml_processor" do
-  let(:yaml_path) {  }
-
+  describe "should render locale yaml file properly" do
+    let ( :file ) { "./spec/test_files/en.yml" }
+    let ( :yaml_processor ) { YamlProcessor.new(file) }
+  end
 end
 
 describe "Merger" do
@@ -28,4 +30,30 @@ describe "Merger" do
       it { should == [result, "z.x.a_1", 6] }
     end
   end
+
+  describe "convert dotted key to nested hash" do
+    let ( :translation_key ) { "a.b.file.name" }
+    let ( :translation ) { "some_value" }
+    subject { Merger.key_to_hash(translation_key, translation) }
+    it { 
+      should == {"a" => {"b" => {"file" => {"name" => translation}}}}
+    }
+  end
+
+  describe "extract value from deeply neested hash" do
+    let ( :translation_key ) { "z.y.a" }
+    subject { Merger.extract_value(translation_key, translation_hash) }
+    it { should == 1}
+  end
+
+  describe "extract value from deeply neested hash" do
+    let ( :translation_key ) { "z.y.a.name" }
+    let ( :new_name ) { "new_name" }
+    subject { Merger.generate_dotted_key(translation_key, new_name) }
+    it { should == "z.y.a.new_name"}
+  end
 end
+
+
+
+

@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   git_files     = `git ls-files | grep -v spec/`.split("\n") rescue ''
   s.files       = git_files
   s.test_files  = s.files.grep(%r{^(spec)/})
-  s.executables = ["slimkeyfy", "slimrestore"]
+  s.executables = ["slimkeyfy"]
   s.require_paths = ["lib"]
   s.add_development_dependency('rspec')
 end

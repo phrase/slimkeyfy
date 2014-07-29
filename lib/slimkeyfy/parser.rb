@@ -116,7 +116,7 @@ class Word
   attr_accessor :translations
 
   def initialize(line, key_base)
-    @line = escape(line)
+    @line = line
     @key_base = key_base
     @indentation = " " * (@line.size - unindented_line.size)
     @translations = {}
@@ -136,10 +136,6 @@ class Word
 
   def slice(sidx=0, eidx=-1)
     as_list[sidx..eidx].join(" ")
-  end
-
-  def escape(line)
-    line.gsub(/\'/, '"')
   end
 
   def i18nString(translation_key)
@@ -191,4 +187,32 @@ class TranslationKeyBuilder
     s
   end
 end
+
+
+class ModelControllerTransformer
+  REGEX = /((notice|message|alert|raise):?\s*)(?<translation>\".*\")/
+
+  def initialize(word, yaml_processor=nil)
+    @word = word
+    @yaml_processor = yaml_processor
+  end
+
+  def transform
+    m = @word.line.match(REGEX)
+    if m != nil then
+      translation = m[:translation]
+      translation_key = update_hashes(translation)
+      localized = @word.line.gsub(translation, translation_key)
+      return [localized, @word.translations]
+    end
+    [nil, nil]
+  end
+
+  def update_hashes(translation)
+    @word.update_translation_key_hash(@yaml_processor, translation)
+  end
+end
+
+
+
 
