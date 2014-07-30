@@ -124,7 +124,7 @@ class CommandLine
   end
   
   def is_valid_ext?(ext)
-    (ext == "slim" or ext == "rb")
+    (ext.end_with?("slim") or ext.end_with?("rb"))
   end
 
   def translate
