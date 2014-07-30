@@ -1,7 +1,7 @@
 
 class Transformer
   T_TAG = /t\(['"]\.?[a-z\_]+["']\)/
-  STRING_WITHOUT_QUOTES = /"(.*)"/
+  STRING_WITHOUT_QUOTES = /("(?<double_quot>.*)"|'(?<single_quot>.*)')/
 
   def initialize(word, yaml_processor=nil)
     @word = word
@@ -17,11 +17,15 @@ class Transformer
   end
 
   def matches_string?(translation)
-    translation.match(STRING_WITHOUT_QUOTES) != nil
+    m = translation.match(STRING_WITHOUT_QUOTES)
+    return false if m.nil?
+    (m[:double_quot] != nil or m[:single_quot] != nil)
   end
 
   def match_string(translation)
-    translation.match(STRING_WITHOUT_QUOTES) ? $1 : translation
+    m = translation.match(STRING_WITHOUT_QUOTES)
+    return translation if m.nil?
+    (m[:double_quot] != nil) ? m[:double_quot] : ((m[:single_quot] != nil) ? m[:single_quot] : translation)
   end
 
   def update_hashes(translation)
@@ -124,6 +128,7 @@ class ModelControllerTransformer < Transformer
     m = @word.line.match(REGEX)
     if m != nil then
       translation = match_string(m[:translation])
+      puts "translation= #{translation.match(STRING_WITHOUT_QUOTES)}"
       translation_key = update_hashes(translation)
       localized = @word.line.gsub(m[:translation], translation_key)
       return [localized, @word.translations]
@@ -141,9 +146,10 @@ class Word
   attr_reader :line, :tokens, :indentation
   attr_accessor :translations
 
-  def initialize(line, key_base)
+  def initialize(line, key_base, extension)
     @line = line
     @key_base = key_base
+    @extension = extension
     @indentation = " " * (@line.size - unindented_line.size)
     @translations = {}
   end
@@ -165,7 +171,8 @@ class Word
   end
 
   def i18nString(translation_key)
-    "t('#{true ? @key_base : ""}.#{translation_key}')"
+    temp_key_base = @extension == "rb" ? @key_base : ""
+    "t('#{temp_key_base}.#{translation_key}')"
   end
 
   def update_translation_key_hash(yaml_processor, translation)

@@ -1,21 +1,22 @@
 class TranslateSlim
 
   def initialize(options={})
-    @processor = processor(options[:ext])
+    @extension = options[:ext]
+    @processor = processor
     @original_file_path = options[:input]
     @bak_path = MFileUtils.backup(@original_file_path)
     @content = FileReader.read(@bak_path).split("\n")
     @file_path = MFileUtils.create_new_file(@original_file_path)
     @yaml_processor = create_yaml_processor(options)
-    @key_base = generate_key_base(options[:ext])
+    @key_base = generate_key_base
     @new_content = []
     @changes = false
   end
 
-  def processor(ext)
-    if ext == "slim" then
+  def processor
+    if @extension == "slim" then
       SlimTransformer
-    elsif ext == "rb" then
+    elsif @extension == "rb" then
       ModelControllerTransformer
     else
       puts "Unknown extension type!"
@@ -29,7 +30,7 @@ class TranslateSlim
 
   def stream_mode
     @content.each_with_index do |old_line, idx|
-      word = Word.new(old_line, @key_base)
+      word = Word.new(old_line, @key_base, @extension)
       new_line, translations = @processor.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
         delete_translations(translations)
@@ -98,8 +99,8 @@ class TranslateSlim
     translations.nil? or translations.empty?
   end
 
-  def generate_key_base(file_extension)
-    KeyGenerator.generate_key_base_from_file(@original_file_path, file_extension)
+  def generate_key_base
+    KeyGenerator.generate_key_base_from_file(@original_file_path, @extension)
   end
 
   def delete_translations(translations)
@@ -110,7 +111,7 @@ class TranslateSlim
 ## not advised to use
   def unix_diff_mode
     @content.each do |old_line|
-      word = Word.new(old_line, @key_base)
+      word = Word.new(old_line, @key_base, @extension)
       new_line, translations = @processor.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
         delete_translations(translations)
