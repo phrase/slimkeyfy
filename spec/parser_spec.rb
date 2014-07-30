@@ -162,11 +162,11 @@ describe "Model and Controllers Transformer should transform .rb correctly" do
       {"#{key_base}.you_have_successfully_done" => "You have successfully done something."}]
     }
   end
-  context "with flash message" do
-    let(:word){ Word.new('mail(to: @user.email, subject: "You have been added to a project on PhraseApp")', key_base, extension) }
+  context "with subject message" do
+    let(:word){ Word.new('mail(to: user_email, subject: "You have been added to a discussion...")', key_base, extension) }
     it {should == [
-      "mail(to: @user.email, subject: t('controllers.some_controller.you_have_been_added'))", 
-      {"#{key_base}.you_have_been_added" => "You have been added to a project on PhraseApp"}]
+      "mail(to: user_email, subject: t('controllers.some_controller.you_have_been_added'))", 
+      {"#{key_base}.you_have_been_added" => "You have been added to a discussion..."}]
     }
   end
 end

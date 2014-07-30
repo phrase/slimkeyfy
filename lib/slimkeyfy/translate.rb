@@ -1,8 +1,8 @@
-class TranslateSlim
+class Translate
 
   def initialize(options={})
     @extension = options[:ext]
-    @processor = processor
+    @transformer = transformer
     @original_file_path = options[:input]
     @bak_path = MFileUtils.backup(@original_file_path)
     @content = FileReader.read(@bak_path).split("\n")
@@ -13,7 +13,7 @@ class TranslateSlim
     @changes = false
   end
 
-  def processor
+  def transformer
     if @extension == "slim" then
       SlimTransformer
     elsif @extension == "rb" then
@@ -31,7 +31,7 @@ class TranslateSlim
   def stream_mode
     @content.each_with_index do |old_line, idx|
       word = Word.new(old_line, @key_base, @extension)
-      new_line, translations = @processor.new(word, @yaml_processor).transform
+      new_line, translations = @transformer.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
         delete_translations(translations)
         update_with(idx, old_line)
@@ -112,7 +112,7 @@ class TranslateSlim
   def unix_diff_mode
     @content.each do |old_line|
       word = Word.new(old_line, @key_base, @extension)
-      new_line, translations = @processor.new(word, @yaml_processor).transform
+      new_line, translations = @transformer.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
         delete_translations(translations)
         @new_content << old_line

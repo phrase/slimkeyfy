@@ -122,15 +122,20 @@ class CommandLine
       end
     end
   end
-  def is_valid_ext?(rec_input)
-    (rec_input.end_with?(".slim") or rec_input.end_with?(".rb"))
+  
+  def is_valid_ext?(ext)
+    (ext == "slim" or ext == "rb")
   end
 
   def translate
-    puts "file=#{@options[:input]}"
-    @options[:ext] = MFileUtils.file_extension(@options[:input])
+    @options[:ext] = ext = MFileUtils.file_extension(@options[:input])
+    unless is_valid_ext?(ext) then
+      puts "invalid Input with extension #{ext}"
+      return
+    end
 
-    translate_slim = TranslateSlim.new(@options)
+    puts "file=#{@options[:input]}"
+    translate_slim = Translate.new(@options)
     if @options[:diff] then
       translate_slim.unix_diff_mode
     else
