@@ -161,10 +161,6 @@ class Word
     @line.sub(/^\s*/, "")
   end
 
-  def match(regex)
-    unindented_line.match(regex)
-  end
-
   def slice(sidx=0, eidx=-1)
     as_list[sidx..eidx].join(" ")
   end

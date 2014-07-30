@@ -98,7 +98,7 @@ class CommandLine
 
   def main
     @options[:input] = input = @args.shift
-    @options[:yaml_file] = yaml_file = @args.shift
+    @options[:yaml_file] = @args.shift
     @options[:locale] = @args.shift
 
     helpful_exit if input.nil?

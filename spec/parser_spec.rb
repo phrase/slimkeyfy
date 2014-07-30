@@ -1,7 +1,6 @@
 require_relative '../lib/slimkeyfy/parser'
 
-describe "SlimTransformer should transform .slim correctly" do
-
+describe "SlimTransformer" do
   let( :key_base ) { "key_base.new"}
   let( :extension ) { "slim" }
   subject  { SlimTransformer.new(word, nil).transform }
@@ -168,6 +167,43 @@ describe "Model and Controllers Transformer should transform .rb correctly" do
       "mail(to: user_email, subject: t('controllers.some_controller.you_have_been_added'))", 
       {"#{key_base}.you_have_been_added" => "You have been added to a discussion..."}]
     }
+  end
+end
+
+describe "Word" do
+  let( :raw_input ) { '       = submit_tag "Search", class: "btn btn-primary"' }
+  let( :key_base ) { "key_base.new"}
+  let( :extension ) { "slim" }
+  let( :word ) { Word.new(raw_input, key_base, extension) }
+  let( :translation_key ) { "hello_world" }
+
+  context "with slim extension the key should be relative" do
+    subject { word.i18nString(translation_key) }
+    it { should == "t('.hello_world')" }
+  end
+
+  context "with rb extension the key should be absolute" do
+    let( :extension ) { "rb" }
+    subject { word.i18nString(translation_key) }
+    it { should == "t('key_base.new.hello_world')" }
+  end
+
+  context "with raw_input and trimmed indentation" do
+    subject { word.unindented_line }
+    it { should == '= submit_tag "Search", class: "btn btn-primary"' }
+  end
+
+  context "when creating translation_keys" do
+    let( :translation ) { "Search" }
+    subject { word.create_translation_keys(translation) }
+    it { should == ['search', 'key_base.new.search'] }
+  end
+
+  context "when converting translation to tagged localization" do
+    let( :translation ) { "Search" }
+    let( :yaml_processor ) { nil }
+    subject { word.update_translation_key_hash(yaml_processor, translation) }
+    it { should == "t('.search')" }
   end
 end
 

@@ -2,18 +2,18 @@ require 'yaml'
 
 class YamlProcessor
 
-  attr_reader :yaml_file_path, :original_yaml_hash, :locale, :translation_hash
+  attr_reader :yaml_file_path, :original_yaml_hash, :locale, :bak_path
 
   def initialize(yaml_file_path, locale="en")
     @bak_path = MFileUtils.backup(yaml_file_path)
     @yaml_file_path = yaml_file_path
     @original_yaml_hash = YAML::load_file(@yaml_file_path)
     @locale = locale
-    @translation_hash = yaml_hash
+    @translation_hash = @original_yaml_hash[@locale]
   end
 
   def yaml_hash
-    @original_yaml_hash[@locale]
+    @translation_hash
   end
 
   def delete_translations(translations)
