@@ -35,18 +35,42 @@ class MFileUtils
     end
     files
   end
+  def self.file_extension(file_path)
+    file_path.split(".").last
+  end
+end
+
+class KeyGenerator
+  def self.generate_key_base_from_file(file_path, file_extension)
+    dir, fname = case file_extension
+      when "slim" then 
+        [subdir_name_views(file_path), filename(file_path)] 
+      when "rb" then 
+        [subdir_name_controller(file_path,), filename(file_path, ".rb")]
+      else nil end
+    "#{dir}.#{fname}"
+  end
   def self.filename(file_path, file_extension=".html.slim")
     return "" if file_path.nil?
     fname = File.basename(file_path, file_extension)
     fname = fname[1..-1] if fname.start_with?("_")
     fname
   end
-  def self.subdir_name(file_path, view_folder="views")
+  def self.subdir_name_views(file_path)
     return "" if file_path.nil?
-    dirs = file_path.split("/").drop_while{|e| e != view_folder}
+    dirs = file_path.split("/").drop_while{|e| e != "views"}
     return "" if dirs.empty?
     strip_dirs_and_file = dirs.pop(dirs.size-1)
     strip_dirs_and_file[0..-2].join(".")
+  end
+  def self.subdir_name_controller(file_path)
+    return "" if file_path.nil?
+    dirs = file_path.split("/").drop_while{|e| e != "controllers"}
+    return "" if dirs.empty?
+    strip_dirs_and_file = dirs.pop(dirs.size)
+    r = strip_dirs_and_file[0..-2].join(".")
+    puts "result= #{r}"
+    r
   end
 end
 

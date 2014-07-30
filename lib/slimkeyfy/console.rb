@@ -77,7 +77,7 @@ class CommandLine
   end
 
   def helpful_exit
-    puts "Please provide a path to .slims and a yaml localization file. See -h for more information."
+    puts "Please provide a path to .slims, a yaml localization file and a locale name. See -h for more information."
     exit
   end
 
@@ -101,8 +101,7 @@ class CommandLine
     @options[:yaml_file] = yaml_file = @args.shift
     @options[:locale] = @args.shift
 
-    helpful_exit if input.nil? 
-    puts "yaml file=#{@options[:yaml_file]}"
+    helpful_exit if input.nil?
 
     if File.directory?(input) then
       directory_translate(input)
@@ -117,15 +116,20 @@ class CommandLine
   def directory_translate(input)
     rec = @options.fetch(:recursive, false)
     MFileUtils.walk(input, rec).each do |rec_input|
-      if File.file?(rec_input) and rec_input.end_with?(".slim") then
+      if File.file?(rec_input) and is_valid_ext?(rec_input) then
         @options[:input] = rec_input
         translate
       end
     end
   end
+  def is_valid_ext?(rec_input)
+    (rec_input.end_with?(".slim") or rec_input.end_with?(".rb"))
+  end
 
   def translate
     puts "file=#{@options[:input]}"
+    @options[:ext] = MFileUtils.file_extension(@options[:input])
+
     translate_slim = TranslateSlim.new(@options)
     if @options[:diff] then
       translate_slim.unix_diff_mode

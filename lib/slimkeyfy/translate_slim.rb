@@ -1,45 +1,36 @@
 class TranslateSlim
 
   def initialize(options={})
+    @processor = processor(options[:ext])
     @original_file_path = options[:input]
     @bak_path = MFileUtils.backup(@original_file_path)
     @content = FileReader.read(@bak_path).split("\n")
     @file_path = MFileUtils.create_new_file(@original_file_path)
     @yaml_processor = create_yaml_processor(options)
-    @key_base = generate_key_base
+    @key_base = generate_key_base(options[:ext])
     @new_content = []
     @changes = false
+  end
+
+  def processor(ext)
+    if ext == "slim" then
+      SlimTransformer
+    elsif ext == "rb" then
+      ModelControllerTransformer
+    else
+      puts "Unknown extension type!"
+      exit
+    end
   end
 
   def create_yaml_processor(options)
     options[:yaml_file] ? YamlProcessor.new(options[:yaml_file], options[:locale]) : nil
   end
 
-  def unix_diff_mode
-    @content.each do |old_line|
-      word = Word.new(old_line, @key_base)
-      new_line, translations = Transformer.new(word, @yaml_processor).transform
-      if translations_are_invalid?(translations)
-        delete_translations(translations)
-        @new_content << old_line
-      else
-        @new_content << new_line
-        @changes = true
-      end
-    end
-    process_unix_diff
-  end
-
-  def process_unix_diff
-    FileWriter.write(@file_path, @new_content.join("\n"))
-    ConsolePrinter.unix_diff(@bak_path, @file_path)
-    finalize!
-  end
-
   def stream_mode
     @content.each_with_index do |old_line, idx|
       word = Word.new(old_line, @key_base)
-      new_line, translations = Transformer.new(word, @yaml_processor).transform
+      new_line, translations = @processor.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
         delete_translations(translations)
         update_with(idx, old_line)
@@ -107,15 +98,35 @@ class TranslateSlim
     translations.nil? or translations.empty?
   end
 
-  def generate_key_base
-    fname = MFileUtils.filename(@original_file_path)
-    dir = MFileUtils.subdir_name(@original_file_path)
-    "#{dir}.#{fname}"
+  def generate_key_base(file_extension)
+    KeyGenerator.generate_key_base_from_file(@original_file_path, file_extension)
   end
 
   def delete_translations(translations)
     return if @yaml_processor.nil?
     @yaml_processor.delete_translations(translations)
+  end
+
+## not advised to use
+  def unix_diff_mode
+    @content.each do |old_line|
+      word = Word.new(old_line, @key_base)
+      new_line, translations = @processor.new(word, @yaml_processor).transform
+      if translations_are_invalid?(translations)
+        delete_translations(translations)
+        @new_content << old_line
+      else
+        @new_content << new_line
+        @changes = true
+      end
+    end
+    process_unix_diff
+  end
+
+  def process_unix_diff
+    FileWriter.write(@file_path, @new_content.join("\n"))
+    ConsolePrinter.unix_diff(@bak_path, @file_path)
+    finalize!
   end
 end
 

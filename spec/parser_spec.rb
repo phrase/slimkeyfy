@@ -1,9 +1,9 @@
 require_relative '../lib/slimkeyfy/parser'
 
-describe "Transformer should transform .slim correctly" do
+describe "SlimTransformer should transform .slim correctly" do
 
   let( :key_base ) { "key_base.new"}
-  subject  { Transformer.new(word, nil).transform }
+  subject  { SlimTransformer.new(word, nil).transform }
 
   describe "with basic html tags" do
     context "with h1 html tag" do
@@ -133,6 +133,14 @@ describe "Transformer should transform .slim correctly" do
       it { should == [ translated , {"key_base.new.upgrade_account"=>"Upgrade Account"}] }
     end
   end
+end
+
+describe "Model and Controllers Transformer should transform .rb correctly" do
+=begin
+  redirect_to root_path, alert: 'You cannot delete your account.'
+redirect_to root_path, alert => 'You cannot delete your account.'
+flash[:notice] = "You have successfully redeemed a voucher and can now use PhraseApp for free for #{@signup.account.days_remaining_in_trial} days." if @signup.account.has_redeemed_vouchers?
+=end
 end
 
 describe "TranslationKeyBuilder" do

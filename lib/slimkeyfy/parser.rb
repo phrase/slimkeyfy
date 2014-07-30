@@ -1,9 +1,37 @@
 
 class Transformer
-
-  HTML_TAGS = /^(\||[a-z]+[0-9]?)/
   T_TAG = /t\(['"]\.?[a-z\_]+["']\)/
-  STRING = /"(.*)"/
+  STRING_WITHOUT_QUOTES = /"(.*)"/
+
+  def initialize(word, yaml_processor=nil)
+    @word = word
+    @yaml_processor = yaml_processor
+  end
+
+  def nil_elem
+    [nil, nil]
+  end
+
+  def should_not_be_processed?(tokens)
+    (tokens.nil? or tokens.size < 2 or @word.line.match(T_TAG))
+  end
+
+  def matches_string?(translation)
+    translation.match(STRING_WITHOUT_QUOTES) != nil
+  end
+
+  def match_string(translation)
+    translation.match(STRING_WITHOUT_QUOTES) ? $1 : translation
+  end
+
+  def update_hashes(translation)
+    @word.update_translation_key_hash(@yaml_processor, translation)
+  end
+end
+
+
+class SlimTransformer < Transformer
+  HTML_TAGS = /^(\||[a-z]+[0-9]?)/
 
   BEFORE = /(?<before>.*)/
   TRANSLATION = /['"](?<translation>.*?)['"]/
@@ -22,11 +50,6 @@ class Transformer
     HTML_ARGUMENTS.values.any?{ |regex| line.match(regex) }
   end
 
-  def initialize(word, yaml_processor=nil)
-    @word = word
-    @yaml_processor = yaml_processor
-  end
-
   def transform
     tokens = @word.as_list
     unindented_line = @word.unindented_line
@@ -41,14 +64,6 @@ class Transformer
     else nil_elem end
 
     result
-  end
-
-  def should_not_be_processed?(tokens)
-    (tokens.nil? or tokens.size < 2 or @word.line.match(T_TAG))
-  end
-
-  def nil_elem
-    [nil, nil]
   end
 
   def simple_html(tokens)
@@ -93,16 +108,27 @@ class Transformer
     s
   end
 
-  def matches_string?(translation)
-    translation.match(STRING) != nil
-  end
-
-  def match_string(translation)
-    translation.match(STRING) ? $1 : translation
-  end
-
   def normalize_translation(translation)
     ["#{@word.indentation}#{translation}", @word.translations]
+  end
+end
+
+
+class ModelControllerTransformer < Transformer
+  STRING = /(\".*\"|\'.*\')/
+  TAGS = /(notice|message|alert|raise|flash\[:[a-z]+\])/
+  CONNECTING_SYMBOLS = /\s*(:|=>?)?\s*/
+  REGEX = /(?<tag>#{TAGS}#{CONNECTING_SYMBOLS})(?<translation>#{STRING})/
+
+  def transform
+    m = @word.line.match(REGEX)
+    if m != nil then
+      translation = match_string(m[:translation])
+      translation_key = update_hashes(translation)
+      localized = @word.line.gsub(m[:translation], translation_key)
+      return [localized, @word.translations]
+    end
+    nil_elem
   end
 
   def update_hashes(translation)
@@ -139,7 +165,7 @@ class Word
   end
 
   def i18nString(translation_key)
-    "t('.#{translation_key}')"
+    "t('#{true ? @key_base : ""}.#{translation_key}')"
   end
 
   def update_translation_key_hash(yaml_processor, translation)
@@ -185,31 +211,6 @@ class TranslationKeyBuilder
       s = s[0..-2]
     end
     s
-  end
-end
-
-
-class ModelControllerTransformer
-  REGEX = /((notice|message|alert|raise):?\s*)(?<translation>\".*\")/
-
-  def initialize(word, yaml_processor=nil)
-    @word = word
-    @yaml_processor = yaml_processor
-  end
-
-  def transform
-    m = @word.line.match(REGEX)
-    if m != nil then
-      translation = m[:translation]
-      translation_key = update_hashes(translation)
-      localized = @word.line.gsub(translation, translation_key)
-      return [localized, @word.translations]
-    end
-    [nil, nil]
-  end
-
-  def update_hashes(translation)
-    @word.update_translation_key_hash(@yaml_processor, translation)
   end
 end
 
