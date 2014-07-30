@@ -120,7 +120,7 @@ end
 
 class ModelControllerTransformer < Transformer
   STRING = /(\".*\"|\'.*\')/
-  TAGS = /(notice|message|alert|raise|flash\[:[a-z]+\])/
+  TAGS = /(notice|message|alert|raise|subject|flash\[:[a-z]+\])/
   CONNECTING_SYMBOLS = /\s*(:|=>?)?\s*/
   REGEX = /(?<tag>#{TAGS}#{CONNECTING_SYMBOLS})(?<translation>#{STRING})/
 
@@ -128,7 +128,6 @@ class ModelControllerTransformer < Transformer
     m = @word.line.match(REGEX)
     if m != nil then
       translation = match_string(m[:translation])
-      puts "translation= #{translation.match(STRING_WITHOUT_QUOTES)}"
       translation_key = update_hashes(translation)
       localized = @word.line.gsub(m[:translation], translation_key)
       return [localized, @word.translations]
