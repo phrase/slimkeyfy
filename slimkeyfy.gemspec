@@ -3,7 +3,7 @@ $:.unshift lib unless $:.include?(lib)
 
 Gem::Specification.new do |s|
   s.name               = "slimkeyfy"
-  s.version            = "0.0.4"
+  s.version            = "0.0.5"
   s.platform           = Gem::Platform::RUBY
   s.homepage    = %q{https://github.com/phrase/slimkeyfy}
   s.authors     = ["Dynport GmbH"]
