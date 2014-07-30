@@ -1,6 +1,6 @@
 
 class Transformer
-  T_TAG = /t\(['"]\.?[a-z\_]+["']\)/
+  TRANSLATED = /(?<t>t[\s\(](".*?"|'.*?')\)?)/
   STRING_WITHOUT_QUOTES = /("(?<double_quot>.*)"|'(?<single_quot>.*)')/
 
   def initialize(word, yaml_processor=nil)
@@ -13,7 +13,7 @@ class Transformer
   end
 
   def should_not_be_processed?(tokens)
-    (tokens.nil? or tokens.size < 2 or @word.line.match(T_TAG))
+    (tokens.nil? or tokens.size < 2)
   end
 
   def matches_string?(translation)
@@ -35,9 +35,9 @@ end
 
 
 class SlimTransformer < Transformer
-  HTML_TAGS = /^(\||[a-z]+[0-9]?)/
+  HTML_TAGS = /^(?<html_tag>\||[a-z]+[0-9]?)/
 
-  BEFORE = /(?<before>.*)/
+  BEFORE = /(?!#{TRANSLATED})(?<before>.*)/
   TRANSLATION = /['"](?<translation>.*?)['"]/
   AFTER = /(?<after>,?.*)?/
 
@@ -71,6 +71,8 @@ class SlimTransformer < Transformer
   end
 
   def simple_html(tokens)
+    return nil_elem if @word.line.match(TRANSLATED)
+
     tagged_with_equals = to_equals_tag(tokens[0])
     translation = match_string(@word.slice(1, -1)).gsub("&nbsp;", " ")
     translation_key = update_hashes(translation)
@@ -105,11 +107,8 @@ class SlimTransformer < Transformer
   def to_equals_tag(s)
     s = s.gsub("|", "=")
     m = s.match(HTML_TAGS)
-    unless m.nil?
-      fst = m.captures.first
-      return "#{fst}=" if fst == s
-    end
-    s
+    return s if m.nil? or m[:html_tag].nil?
+    s.gsub(m[:html_tag], "#{m[:html_tag]}=")
   end
 
   def normalize_translation(translation)
