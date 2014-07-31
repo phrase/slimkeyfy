@@ -55,26 +55,24 @@ class SlimTransformer < Transformer
   end
 
   def transform
-    tokens = @word.as_list
+    return nil_elem if should_not_be_processed?(@word.as_list)
     unindented_line = @word.unindented_line
-
-    return nil_elem if should_not_be_processed?(tokens)
 
     result = 
     if match_any_slim?(unindented_line) then
       complex_html(unindented_line)
-    elsif tokens[0].match(HTML_TAGS) then
-      simple_html(tokens)
+    elsif @word.head.match(HTML_TAGS) then
+      simple_html
     else nil_elem end
 
     result
   end
 
-  def simple_html(tokens)
+  def simple_html
     return nil_elem if @word.line.match(TRANSLATED)
 
-    tagged_with_equals = to_equals_tag(tokens[0])
-    translation = match_string(@word.slice(1, -1)).gsub("&nbsp;", " ")
+    tagged_with_equals = to_equals_tag(@word.head)
+    translation = convert_html_whitespace(match_string(@word.tail.join(" ")))
     translation_key = update_hashes(translation)
     normalize_translation("#{tagged_with_equals} #{translation_key}")
   end
@@ -98,17 +96,15 @@ class SlimTransformer < Transformer
     line
   end
 
-  def strings(tokens, translation)
-    plain_translation = match_string(translation).gsub("&nbsp;", " ")
-    translation_key = update_hashes(plain_translation)
-    tokens.join(" ").gsub(STRING, "#{translation_key}")
-  end
-
   def to_equals_tag(s)
     s = s.gsub("|", "=")
     m = s.match(HTML_TAGS)
     return s if m.nil? or m[:html_tag].nil?
     s.gsub(m[:html_tag], "#{m[:html_tag]}=")
+  end
+
+  def convert_html_whitespace(s)
+    s.gsub("&nbsp;", " ")
   end
 
   def normalize_translation(translation)
@@ -119,7 +115,7 @@ end
 
 class ModelControllerTransformer < Transformer
   STRING = /(\".*\"|\'.*\')/
-  TAGS = /(notice|message|alert|raise|subject|flash\[:[a-z]+\])/
+  TAGS = /(text|notice|message|alert|raise|subject|flash\[:[a-z]+\])/
   CONNECTING_SYMBOLS = /\s*(:|=>?)?\s*/
   REGEX = /(?<tag>#{TAGS}#{CONNECTING_SYMBOLS})(?<translation>#{STRING})/
 
@@ -156,8 +152,12 @@ class Word
     @line.sub(/^\s*/, "")
   end
 
-  def slice(sidx=0, eidx=-1)
-    as_list[sidx..eidx].join(" ")
+  def head
+    as_list.first
+  end
+
+  def tail
+    as_list.drop(1)
   end
 
   def i18nString(translation_key)
@@ -214,8 +214,3 @@ class TranslationKeyBuilder
     s
   end
 end
-
-
-
-
-
