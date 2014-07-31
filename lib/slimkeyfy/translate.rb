@@ -65,7 +65,7 @@ class Translate
     delim = "<#{"="*50}>"
     temp = translations.map{ |k, v| 
       dir, file, name = k.split(".")
-      "#{dir}.#{file} | #{name}: #{v} | t('.#{name}')\n"
+      "#{dir}.#{file} | #{name}: #{v} | t('.#{name}')"
     }
     "#{delim}\n#{old_line}\n#{temp}\n#{delim}"
   end

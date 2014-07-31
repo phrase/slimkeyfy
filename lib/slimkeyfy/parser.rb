@@ -169,15 +169,16 @@ class Word
   end
 
   def update_translation_key_hash(yaml_processor, translation)
-    translation_key_without_base, translation_key = create_translation_keys(translation)
-    translation_key, translation = yaml_processor.merge!(translation_key, translation) unless yaml_processor.nil?
-    @translations.merge!({translation_key => translation})
-    i18nString(translation_key_without_base)
+    translation_key = TranslationKeyBuilder.new(translation).generate_key_name
+    translation_key_with_base = "#{@key_base}.#{translation_key}"
+    translation_key_with_base, translation = yaml_processor.merge!(translation_key_with_base, translation) unless yaml_processor.nil?
+    @translations.merge!({translation_key_with_base => translation})
+    i18nString(extract_updated_key(translation_key_with_base))
   end
 
-  def create_translation_keys(translation)
-    translation_key_without_base = TranslationKeyBuilder.new(translation).generate_key_name
-    [translation_key_without_base, "#{@key_base}.#{translation_key_without_base}"]
+  def extract_updated_key(translation_key_with_base)
+    return "" if (translation_key_with_base.nil? or translation_key_with_base.empty?)
+    translation_key_with_base.split(".").last
   end
 end
 

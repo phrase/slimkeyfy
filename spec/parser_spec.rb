@@ -205,17 +205,23 @@ describe "Word" do
     it { should == '= submit_tag "Search", class: "btn btn-primary"' }
   end
 
-  context "when creating translation_keys" do
-    let( :translation ) { "Search" }
-    subject { word.create_translation_keys(translation) }
-    it { should == ['search', 'key_base.new.search'] }
-  end
-
   context "when converting translation to tagged localization" do
     let( :translation ) { "Search" }
     let( :yaml_processor ) { nil }
     subject { word.update_translation_key_hash(yaml_processor, translation) }
     it { should == "t('.search')" }
+  end
+
+  context "extract a dotted key" do
+    let( :translation_key_with_base ) { "users.show.hello_world" }
+    subject{ word.extract_updated_key(translation_key_with_base) }
+    it { should == "hello_world" }
+  end
+
+  context "extract a dotted key when key is nil" do
+    let( :translation_key_with_base ) { nil }
+    subject{ word.extract_updated_key(translation_key_with_base) }
+    it { should == "" }
   end
 end
 
