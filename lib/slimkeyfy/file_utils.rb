@@ -42,13 +42,19 @@ end
 
 class KeyGenerator
   def self.generate_key_base_from_file(file_path, file_extension)
-    dir, fname = case file_extension
+    key_name = case file_extension
       when "slim" then 
-        [subdir_name_views(file_path), filename(file_path)] 
+        [subdir_name(file_path), filename(file_path)].join(".") 
       when "rb" then 
-        [subdir_name_controller(file_path,), filename(file_path, ".rb")]
+        sub = subdir_name(file_path, ["controllers", "models"])
+        fname = filename(file_path, ".rb")
+        if sub != nil and !sub.strip.empty? then
+          "#{sub}.#{fname}"
+        else
+          fname
+        end
       else nil end
-    "#{dir}.#{fname}"
+    key_name
   end
   def self.filename(file_path, file_extension=".html.slim")
     return "" if file_path.nil?
@@ -56,21 +62,12 @@ class KeyGenerator
     fname = fname[1..-1] if fname.start_with?("_")
     fname
   end
-  def self.subdir_name_views(file_path)
+  def self.subdir_name(file_path, delim=["views"])
     return "" if file_path.nil?
-    dirs = file_path.split("/").drop_while{|e| e != "views"}
+    dirs = file_path.split("/").drop_while{|e| delim.all?{|d| e != d }}
     return "" if dirs.empty?
     strip_dirs_and_file = dirs.pop(dirs.size-1)
     strip_dirs_and_file[0..-2].join(".")
-  end
-  def self.subdir_name_controller(file_path)
-    return "" if file_path.nil?
-    dirs = file_path.split("/").drop_while{|e| e != "controllers"}
-    return "" if dirs.empty?
-    strip_dirs_and_file = dirs.pop(dirs.size)
-    r = strip_dirs_and_file[0..-2].join(".")
-    puts "result= #{r}"
-    r
   end
 end
 
@@ -91,3 +88,4 @@ class FileWriter
     open(full_path, 'a') { |f| f.puts content}
   end
 end
+

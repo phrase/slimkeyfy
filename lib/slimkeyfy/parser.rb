@@ -133,10 +133,6 @@ class ModelControllerTransformer < Transformer
     end
     nil_elem
   end
-
-  def update_hashes(translation)
-    @word.update_translation_key_hash(@yaml_processor, translation)
-  end
 end
 
 
@@ -165,8 +161,11 @@ class Word
   end
 
   def i18nString(translation_key)
-    temp_key_base = @extension == "rb" ? @key_base : ""
-    "t('#{temp_key_base}.#{translation_key}')"
+    if @extension == "rb" then
+      "t('#{@key_base}.#{translation_key}')"
+    else
+      "t('.#{translation_key}')"
+    end
   end
 
   def update_translation_key_hash(yaml_processor, translation)
