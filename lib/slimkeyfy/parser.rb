@@ -33,10 +33,6 @@ class Transformer
   end
 end
 
-class SaveTransformation
-
-end
-
 class SlimTransformer < Transformer
   HTML_TAGS = /^(?<html_tag>\||[a-z]+[0-9]?)/
 

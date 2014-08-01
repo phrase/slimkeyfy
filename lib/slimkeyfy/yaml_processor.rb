@@ -16,7 +16,9 @@ class YamlProcessor
     if File.exist?(path) then 
       path
     else
-      MFileUtils.create_new_file(path)
+      path = File.expand_path(path)
+      FileWriter.overwrite(path)
+      path
     end
   end
 

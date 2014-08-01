@@ -82,7 +82,7 @@ class FileWriter
     self.write(full_path, content)
   end
   def self.write(full_path, content)
-    File.open(full_path, "w") { |f| f.write(content) }
+    File.open(full_path, "w+") { |f| f.write(content) }
   end
   def self.append(full_path, content)
     open(full_path, 'a') { |f| f.puts content}
