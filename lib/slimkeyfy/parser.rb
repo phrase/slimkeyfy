@@ -33,17 +33,22 @@ class Transformer
   end
 end
 
+class SaveTransformation
+
+end
 
 class SlimTransformer < Transformer
   HTML_TAGS = /^(?<html_tag>\||[a-z]+[0-9]?)/
 
-  BEFORE = /(?!#{TRANSLATED})(?<before>.*)/
+  NOT_TRANSLATED = /(?!=#{TRANSLATED})/
+  BEFORE = /(?<before>.*)/
   TRANSLATION = /['"](?<translation>.*?)['"]/
   AFTER = /(?<after>,?.*)?/
 
   HTML_ARGUMENTS = {
     hint: /#{BEFORE}(?<html_tag>hint:\s*)["'](?<translation>.*)["']/,
-    link_to: /#{BEFORE}(?<html_tag>link_to(\s[a-z]*)?\(?)#{TRANSLATION}#{AFTER}/,
+    link_to: /#{NOT_TRANSLATED}#{BEFORE}(?<html_tag>link_to(\s[a-z]*)?\(?)#{TRANSLATION}#{AFTER}/,
+    inconified: /#{BEFORE}(?<html_tag>inconified\(\s*)#{TRANSLATION}#{AFTER}/,
     placeholder: /#{BEFORE}(?<html_tag>placeholder:\s*)#{TRANSLATION}#{AFTER}/,
     title: /#{BEFORE}(?<html_tag>title:\s*)#{TRANSLATION}#{AFTER}/,
     label: /#{BEFORE}(?<html_tag>[a-z]*_?label:\s*)#{TRANSLATION}#{AFTER}/,
