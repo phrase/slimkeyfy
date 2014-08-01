@@ -1,5 +1,7 @@
 class Translate
 
+  attr_reader :original_file_path, :bak_path
+
   def initialize(options={})
     @extension = options[:ext]
     @transformer = transformer
@@ -25,7 +27,9 @@ class Translate
   end
 
   def create_yaml_processor(options)
-    options[:yaml_output] ? YamlProcessor.new(options[:locale], options[:yaml_output]) : YamlProcessor.new(locale)
+    options[:yaml_output] ? 
+      YamlProcessor.new(options[:locale], options[:yaml_output]) : 
+        YamlProcessor.new(options[:locale])
   end
 
   def stream_mode
@@ -33,7 +37,7 @@ class Translate
       word = Word.new(old_line, @key_base, @extension)
       new_line, translations = @transformer.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
-        delete_translations(translations)
+        @yaml_processor.delete_translations(translations)
         update_with(idx, old_line)
       else
         process_new_line(idx, old_line, new_line, translations)
@@ -50,10 +54,10 @@ class Translate
       when "y" then update_with(idx, new_line)
       when "n" then 
         update_with(idx, old_line)
-        delete_translations(translations)
+        @yaml_processor.delete_translations(translations)
       when "x" then 
         update_with(idx, tag(old_line, translations))
-        delete_translations(translations)
+        @yaml_processor.delete_translations(translations)
       when "a" then
         MFileUtils.restore(@bak_path, @original_file_path)
         puts "Aborted!"
@@ -71,23 +75,17 @@ class Translate
   end
 
   def finalize!
-    begin
-      if @changes then
-        if IOAction.yes_or_no?("Do you like what you see?") then
-          @yaml_processor.store! unless @yaml_processor.nil?
-          puts "Processed!"
-        else
-          MFileUtils.restore(@bak_path, @original_file_path)
-          @yaml_processor.restore unless @yaml_processor.nil?
-          puts "Restored!"
-        end
-      else 
+    if @changes then
+      if IOAction.yes_or_no?("Do you like what you see?") then
+        @yaml_processor.store!(@key_base)
+        puts "Processed!"
+      else
         MFileUtils.restore(@bak_path, @original_file_path)
-        puts "Nothing was changed!" 
+        puts "Restored!"
       end
-    rescue SystemExit, Interrupt
+    else 
       MFileUtils.restore(@bak_path, @original_file_path)
-      yaml_processor.restore
+      puts "Nothing was changed!" 
     end
   end
 
@@ -101,11 +99,6 @@ class Translate
 
   def generate_key_base
     KeyGenerator.generate_key_base_from_file(@original_file_path, @extension)
-  end
-
-  def delete_translations(translations)
-    return if @yaml_processor.nil?
-    @yaml_processor.delete_translations(translations)
   end
 
 ## not advised to use

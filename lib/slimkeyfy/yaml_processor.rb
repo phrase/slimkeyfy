@@ -4,13 +4,7 @@ class YamlProcessor
 
   attr_reader :yaml_output, :locale, :yaml_hash
 
-  def default_yaml(locale)
-    "./config/locales/slimkeyfy.#{locale}.yml"
-  end
-
-  def initialize(locale, yaml_output=nil)
-    @yaml_output = if yaml_output.nil? then
-      default_yaml(locale) else yaml_output end
+  def initialize(locale)
     @locale = locale
     @yaml_hash = {}
   end
@@ -24,9 +18,26 @@ class YamlProcessor
     end
   end
 
-  def store!
+  def store!(key)
+    dir_of_key = key.split(".").first
+    default_dir = default_yaml(dir_of_key, @locale)
     merged = {@locale => @yaml_hash}
-    FileWriter.write(@yaml_output, merged.to_yaml)
+    if hash_loadable(default_dir) then
+      FileWriter.append(default_dir, merged[@locale][dir_of_key].to_yaml)
+    else
+      FileWriter.write(default_dir, merged.to_yaml)
+    end
+  end
+
+  def hash_loadable(default_dir)
+    if File.exist?(default_dir)
+      h = YAML::load_file(default_dir)
+      h ? true : false
+    else false end
+  end
+
+  def default_yaml(key, locale)
+    "./config/locales/#{key}.#{locale}.yml"
   end
 
   def merge!(translation_key, translation)
@@ -36,10 +47,12 @@ class YamlProcessor
 end
 
 class Merger
-  def self.merge_hashes(old_translations, new_translations)
-    new_translations.each do |k, v|
-      merge_single_translation(old_translations, new_translations)
+  def self.merge_hashes(old_translations={}, new_translations={})
+    key = new_translations.keys.first
+    new_translations[key].keys.each do |top_key|
+      new_translations[key][top_key]
     end
+    old_translations.merge(new_translations["translation_key"])
   end
 
   def self.merge_single_translation(translations, translation_key, translation)

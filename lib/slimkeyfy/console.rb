@@ -138,11 +138,20 @@ class CommandLine
 
     puts "file=#{@options[:input]}"
     translate_slim = Translate.new(@options)
-    if @options[:diff] then
-      translate_slim.unix_diff_mode
-    else
-      translate_slim.stream_mode
+    rescue_on_exit(translate_slim)
+  end
+
+  def rescue_on_exit(translate_slim)
+    begin
+      if @options[:diff] then
+        translate_slim.unix_diff_mode
+      else
+        translate_slim.stream_mode
+      end
+    rescue Interrupt
+      MFileUtils.restore(translate_slim.bak_path, translate_slim.original_file_path)
     end
   end
+
 end
 
