@@ -82,13 +82,16 @@ class CommandLine
   end
 
   def opt_scan(opts)
-    opts.banner = "Usage: slimkeyfy INPUT_FILENAME_OR_DIRECTORY [LOCALIZATION_YAML_FILE] [LOCALE e.g. en, fr] [Options]"
+    opts.banner = "Usage: slimkeyfy INPUT_FILENAME_OR_DIRECTORY [LOCALE e.g. en, fr] [Options]"
     opts.on_tail('-h', '--help', 'Show this message') do
       puts opts
       exit
     end
     opts.on_tail('-d', '--diff', 'Uses unix diff or colordiff for full file comparison') do
       @options[:diff] = true
+    end
+    opts.on_tail('-yaml', '--yaml_output', 'Uses unix diff or colordiff for full file comparison') do | path |
+      @options[:yaml_output] = path
     end
     opts.on_tail('-r', '--recursive', 'If a directory is given all subdirectories will be walked either. 
       Without -r and a directory just the files within the first level are walked.') do
@@ -98,7 +101,6 @@ class CommandLine
 
   def main
     @options[:input] = input = @args.shift
-    @options[:yaml_file] = @args.shift
     @options[:locale] = @args.shift
 
     helpful_exit if input.nil?

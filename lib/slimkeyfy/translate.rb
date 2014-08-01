@@ -25,7 +25,7 @@ class Translate
   end
 
   def create_yaml_processor(options)
-    options[:yaml_file] ? YamlProcessor.new(options[:yaml_file], options[:locale]) : nil
+    options[:yaml_output] ? YamlProcessor.new(options[:locale], options[:yaml_output]) : YamlProcessor.new(locale)
   end
 
   def stream_mode

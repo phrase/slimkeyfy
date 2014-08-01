@@ -2,40 +2,35 @@ require 'yaml'
 
 class YamlProcessor
 
-  attr_reader :yaml_file_path, :original_yaml_hash, :locale, :bak_path
+  attr_reader :yaml_output, :locale, :yaml_hash
 
-  def initialize(yaml_file_path, locale="en")
-    @bak_path = MFileUtils.backup(yaml_file_path)
-    @yaml_file_path = yaml_file_path
-    @original_yaml_hash = YAML::load_file(@yaml_file_path)
-    @locale = locale
-    @translation_hash = @original_yaml_hash[@locale]
+  def default_yaml(locale)
+    "./config/locales/slimkeyfy.#{locale}.yml"
   end
 
-  def yaml_hash
-    @translation_hash
+  def initialize(locale, yaml_output=nil)
+    @yaml_output = if yaml_output.nil? then
+      default_yaml(locale) else yaml_output end
+    @locale = locale
+    @yaml_hash = {}
   end
 
   def delete_translations(translations)
-    return if translations.nil?
+    return if translations.nil? or translations.empty? or @yaml_hash.empty?
     translations.each do |k, v|
       path = k.split('.')
       leaf = path.pop
-      path.inject(@translation_hash){|h, el| h[el]}.delete(leaf)
+      path.inject(@yaml_hash){|h, el| h[el]}.delete(leaf)
     end
   end
 
   def store!
-    merged = {@locale => @translation_hash}
-    FileWriter.write(@yaml_file_path, merged.to_yaml)
-  end
-
-  def restore
-    MFileUtils.restore(@bak_path, @yaml_file_path)
+    merged = {@locale => @yaml_hash}
+    FileWriter.write(@yaml_output, merged.to_yaml)
   end
 
   def merge!(translation_key, translation)
-    @translation_hash, translation_key, translation = Merger.merge_single_translation(@translation_hash, translation_key, translation)
+    @yaml_hash, translation_key, translation = Merger.merge_single_translation(@yaml_hash, translation_key, translation)
     [translation_key, translation]
   end
 end
