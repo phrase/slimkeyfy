@@ -133,8 +133,8 @@ If you are already familiar with the PhraseApp gem you can upload your translati
 
 Helpful Information
 -------------------
-* Other tools, not slim specific for this task is the i15r gem. It can process .haml and .erb.
-* I strongly recommend checking your translated app with the i18n-tasks gem. It is a great tool in     finding missing and unused translations.
+* Other tools, not slim specific for this task is the [i15r gem](https://github.com/balinterdi/i15r). It can process .haml and .erb.
+* I strongly recommend checking your translated app with the [i18n-tasks gem](https://github.com/glebm/i18n-tasks). It is a great tool in     finding missing and unused translations.
 
 Issues
 ------
