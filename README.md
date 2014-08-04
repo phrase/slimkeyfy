@@ -1,4 +1,4 @@
-Slimkeyfy
+Slimkeyfy (0.0.5)
 ========
 Extract rails i18n keys from slim partials and replace strings with t() method calls adding unique nested keys to selected .yml localization file.
 ```ruby
@@ -20,13 +20,13 @@ Install
 git clone https://github.com/phrase/slimkeyfy.git 
 cd slimkeyfy
 gem build slimkeyfy.gemspec
-gem install slimkeyfy-0.0.2.gem
+gem install slimkeyfy-0.0.5.gem
 # Later: gem install slimkeyfy
 ```
 
 Approach
 --------
-The current approach like most, go for a 80/20 solution. Localizing files is extremely error prone so I decided that the user should verify each change. That means that you will be prompted for each possible translation to choose whether you like to keep it, to ignore it or to tag it. In the future it might be possible to parse the 80% automatically and ask for the 20% in return. The collected data is then processed into a yaml file. The file is optional so your existing .yml files will not be corrupted. If none is given a file will be created at configs/locales/view_folder_name.locale.yml. All your processed views will be appended to the given file. It is therefore strongly recommended to take a systematic approach one view directory at a time.
+The current approach goes for a 80/20 solution. Localizing files is extremely error prone so I decided that the user should verify each change. That means that you will be prompted for each possible translation to choose whether you like to keep it, to ignore it or to tag it. In the future it might be possible to parse the 80% automatically and ask for the 20% in return. The collected data is then processed into a yaml file. If you don't provide a yaml one will be created at configs/locales/view_folder_name.locale.yml. All your processed views will be merged with the given one.
 
 Usage
 -----
@@ -37,7 +37,7 @@ Two modes are supported:
 
 1. **Stream** - **recommended** - default mode, walks through the given file/files and if an untagged plain string is found you are prompted to apply (y)es, discard (n)o, tag (x) if you would like it to be marked for later (like a git conflict) or to (a)bort (only aborts the current file process).
 
-2. **Diff** - **currently not recommended** - Applies all changes and uses colordiff or diff to show any changes between the files. Faster if you do not like to approve every single matching line. It is also more error prone because some faulty translations will be translated nonetheless. In the future somewhat 80% will be parsed and you will be prompted for 20%.
+2. **Diff** - **currently not recommended** - Applies all changes and uses colordiff or diff to show any changes between the files. Faster if you do not like to approve every single matching line. It is also more error prone because some faulty translations will be translated nonetheless. In the future it might be possible to parse 80% for sure and be prompted about the 20%.
 
 default stream mode
 ```unix
@@ -119,17 +119,21 @@ your_app_name/
     user:
       new:
         hello_world: Hello World!
-  ---
-    show:
-      ...
+      show:
+        ...
 ```
 PhraseApp Integration
 --------------------
-Coming soon...
+Now that you processed your views and moved the generated keys to your localization files it is quite easy to push it to PhraseApp. If you have not set up your account yet [take a look here](https://phraseapp.com/docs/about/setup-your-translations-with-phraseapp?language=en). Make sure that the latest gem of PhraseApp is installed by simply typing:
+```unix
+> gem install phrase
+```
+If you are already familiar with the PhraseApp gem you can upload your translation/localization files now (normally found in app_folder/config/locales/ or app_folder/phrase/locales/. Otherwise have a look at our [detailed guide](https://phraseapp.com/docs/about/access-your-locale-files-with-the-api-client?language=en).
+
 
 Helpful Information
 -------------------
-* Other tools, not slim specific for this tasks is the i15r gem. It can process .haml and .erb.
+* Other tools, not slim specific for this task is the i15r gem. It can process .haml and .erb.
 * I strongly recommend checking your translated app with the i18n-tasks gem. It is a great tool in     finding missing and unused translations.
 
 Issues
