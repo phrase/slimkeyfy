@@ -1,6 +1,6 @@
 
 class Transformer
-  TRANSLATED = /(?<t>t[\s\(](".*?"|'.*?')\)?)/
+  TRANSLATED = /t\s*\(?\s*(".*?"|'.*?')\s*\)?/
   STRING_WITHOUT_QUOTES = /("(?<double_quot>.*)"|'(?<single_quot>.*)')/
 
   def initialize(word, yaml_processor=nil)
@@ -36,14 +36,13 @@ end
 class SlimTransformer < Transformer
   HTML_TAGS = /^(?<html_tag>\||[a-z]+[0-9]?)/
 
-  NOT_TRANSLATED = /(?!=#{TRANSLATED})/
   BEFORE = /(?<before>.*)/
   TRANSLATION = /['"](?<translation>.*?)['"]/
   AFTER = /(?<after>,?.*)?/
 
   HTML_ARGUMENTS = {
     hint: /#{BEFORE}(?<html_tag>hint:\s*)["'](?<translation>.*)["']/,
-    link_to: /#{NOT_TRANSLATED}#{BEFORE}(?<html_tag>link_to(\s[a-z]*)?\(?)#{TRANSLATION}#{AFTER}/,
+    link_to: /#{BEFORE}(?<html_tag>link_to(\s[a-z]*)?\(?)#{TRANSLATION}#{AFTER}/,
     inconified: /#{BEFORE}(?<html_tag>inconified\(\s*)#{TRANSLATION}#{AFTER}/,
     placeholder: /#{BEFORE}(?<html_tag>placeholder:\s*)#{TRANSLATION}#{AFTER}/,
     title: /#{BEFORE}(?<html_tag>title:\s*)#{TRANSLATION}#{AFTER}/,
@@ -90,6 +89,9 @@ class SlimTransformer < Transformer
       if m_data != nil then
         before, html_tag, translation = m_data[:before], m_data[:html_tag], m_data[:translation]
         after = m_data.names.include?("after") ? m_data[:after] : ""
+        
+        next if line_already_translated?(line, html_tag)
+
         translation_key = update_hashes(translation)
         line = "#{before}#{html_tag}#{translation_key}#{after}"
       end
@@ -97,11 +99,20 @@ class SlimTransformer < Transformer
     line
   end
 
+  def line_already_translated?(line, html_tag)
+    line.match(TRANSLATED) != nil and html_tag.match(/link_to/) != nil
+  end
+
   def to_equals_tag(s)
     s = s.gsub("|", "=")
     m = s.match(HTML_TAGS)
     return s if m.nil? or m[:html_tag].nil?
+    return s if has_equals_tag(s, m[:html_tag])
     s.gsub(m[:html_tag], "#{m[:html_tag]}=")
+  end
+
+  def has_equals_tag(s, html_tag)
+    s.gsub(html_tag, "").strip.start_with?("=")
   end
 
   def convert_html_whitespace(s)

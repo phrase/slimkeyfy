@@ -44,7 +44,7 @@ describe "SlimTransformer" do
 
     context "with valid tag and nothing to translate" do
       let(:word){ Word.new("= link_to 'blubb', hint: t '.actions' ", key_base, extension) }
-      it {should == ["= link_to t('.blubb'), hint: t '.actions' ", {"key_base.new.blubb"=>"blubb"}]}
+      it {should == ["= link_to 'blubb', hint: t '.actions' ", {}]}
     end
   end
 
@@ -97,9 +97,9 @@ describe "SlimTransformer" do
       let( :raw_input ) { '= link_to iconified("Hello World!", :pencil), title: "Hi there! How are, you?!", :translation_search => {:query => translation.translation_key.nil? ? "" : "\"#{translation.translation_key.name}\"" }), placeholder: "Hi there! How are, you?!", :class => "btn btn-default btn-sm tooltipped", hint: "Hi! What up?"'}
       let(:word) { Word.new(raw_input,key_base, extension) }
       let(:translated) { 
-        '= link_to iconified(t(\'.hello_world\'), :pencil), title: t(\'.hi_there_how_are\'), :translation_search => {:query => translation.translation_key.nil? ? "" : "\"#{translation.translation_key.name}\"" }), placeholder: t(\'.hi_there_how_are\'), :class => "btn btn-default btn-sm tooltipped", hint: t(\'.hi_what_up\')'
+        '= link_to iconified("Hello World!", :pencil), title: t(\'.hi_there_how_are\'), :translation_search => {:query => translation.translation_key.nil? ? "" : "\"#{translation.translation_key.name}\"" }), placeholder: t(\'.hi_there_how_are\'), :class => "btn btn-default btn-sm tooltipped", hint: t(\'.hi_what_up\')'
       }
-      let(:word_translation) { {"key_base.new.hello_world"=>"Hello World!", "key_base.new.hi_there_how_are"=>"Hi there! How are, you?!", "key_base.new.hi_what_up"=>"Hi! What up?"} }
+      let(:word_translation) { {"key_base.new.hi_there_how_are"=>"Hi there! How are, you?!", "key_base.new.hi_what_up"=>"Hi! What up?"} }
       it { should == [ translated , word_translation] }
     end
 

@@ -14,15 +14,13 @@ class YamlProcessor
   def process_output_file(yaml_output)
     if yaml_output.nil? then
       dir_of_key = @key_base.split(".").first
-      puts dir_of_key
-      return default_yaml(dir_of_key, @locale)
+      yaml_output = default_yaml(dir_of_key, @locale)
     end
-    path = MFileUtils.abs_path(yaml_output.to_s)
+    path = File.expand_path(yaml_output.to_s)
     if File.exist?(path) then 
       path
     else
-      path = File.expand_path(path)
-      FileWriter.overwrite(path)
+      FileWriter.overwrite(path, "---")
       path
     end
   end
@@ -48,7 +46,7 @@ class YamlProcessor
   end
 
   def default_yaml(key, locale)
-    "./config/locales/#{key}.#{locale}.yml"
+    File.expand_path("./config/locales/#{key}.#{locale}.yml")
   end
 
   def merge!(translation_key, translation)
