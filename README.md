@@ -1,6 +1,6 @@
 Slimkeyfy (0.0.6)
 ========
-Extract rails i18n keys from slim partials and replace strings with t() method calls adding unique nested keys to selected .yml localization file.
+Extract plain Strings from .slim views and rails controllers to replace them with I18n's t() method. Keys and .yml output files will be automatically generated and filled in.
 ```ruby
 slimkeyfy app/views/users/show.html.slim en
 # users/show.html.slim

@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.platform           = Gem::Platform::RUBY
   s.homepage    = %q{https://github.com/phrase/slimkeyfy}
   s.authors     = ["Dynport GmbH"]
-  s.summary     = %q{The best way to tag plain strings with i18n.}
-  s.description = %q{Replace plain text strings in your .slim views with I18n tags}
+  s.summary     = %q{Extract plain Strings from .slim to replace them with I18n's t() method.}
+  s.description = %q{Replace plain text strings in your .slim views and rails controllers with I18n t() method. Keys and .yml output files will be automatically generated and filled in.}
   s.email       = %q{xx@xx.com}
   git_files     = `git ls-files | grep -v spec/`.split("\n") rescue ''
   s.files       = git_files
