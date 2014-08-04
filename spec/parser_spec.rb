@@ -147,10 +147,10 @@ describe "SlimTransformer" do
   end
 end
 
-describe "Model and Controllers Transformer should transform .rb correctly" do
+describe "Controllers Transformer should transform .rb correctly" do
   let( :key_base ) { "some_controller"}
   let( :extension ) { "rb" }
-  subject  { ModelControllerTransformer.new(word, nil).transform }
+  subject  { ControllerTransformer.new(word, nil).transform }
 
   context "with alert message and new syntax" do
     let(:word){ Word.new("redirect_to root_path, alert: 'You cannot delete your account.'",key_base, extension) }
@@ -224,29 +224,5 @@ describe "Word" do
     it { should == "" }
   end
 end
-
-describe "TranslationKeyBuilder" do
-  subject { TranslationKeyBuilder.new(translation).generate_key_name }
-
-  context "with valid translation and special characters" do
-    let( :translation ) { ":Hello 'World!~" }
-    it { should ==  "hello_world" }
-  end
-
-  context "with special characters only" do
-    let( :translation ) { ":{}'!~" }
-    it { should ==  "default_key" }
-  end
-
-  context "with empty translation" do
-    let( :translation ) { "" }
-    it { should == "default_key" }
-  end
-end
-
-
-
-
-
 
 

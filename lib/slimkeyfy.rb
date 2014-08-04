@@ -8,6 +8,7 @@ class SlimKeyfy
 end
 
 require_relative 'slimkeyfy/file_utils'
+require_relative 'slimkeyfy/key_generator'
 require_relative 'slimkeyfy/console'
 require_relative 'slimkeyfy/yaml_processor'
 require_relative 'slimkeyfy/translate'

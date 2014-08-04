@@ -9,8 +9,8 @@ class Translate
     @bak_path = MFileUtils.backup(@original_file_path)
     @content = FileReader.read(@bak_path).split("\n")
     @file_path = MFileUtils.create_new_file(@original_file_path)
+    @key_base = BaseKeyGenerator.generate_key_base_from_path(@original_file_path, @extension)
     @yaml_processor = create_yaml_processor(options)
-    @key_base = generate_key_base
     @new_content = []
     @changes = false
   end
@@ -19,7 +19,7 @@ class Translate
     if @extension == "slim" then
       SlimTransformer
     elsif @extension == "rb" then
-      ModelControllerTransformer
+      ControllerTransformer
     else
       puts "Unknown extension type!"
       exit
@@ -28,8 +28,8 @@ class Translate
 
   def create_yaml_processor(options)
     options[:yaml_output] ? 
-      YamlProcessor.new(options[:locale], options[:yaml_output]) : 
-        YamlProcessor.new(options[:locale])
+      YamlProcessor.new(options[:locale], @key_base, options[:yaml_output]) : 
+        YamlProcessor.new(options[:locale], @key_base)
   end
 
   def stream_mode
@@ -77,7 +77,7 @@ class Translate
   def finalize!
     if @changes then
       if IOAction.yes_or_no?("Do you like what you see?") then
-        @yaml_processor.store!(@key_base)
+        @yaml_processor.store!
         puts "Processed!"
       else
         MFileUtils.restore(@bak_path, @original_file_path)
@@ -95,10 +95,6 @@ class Translate
 
   def translations_are_invalid?(translations)
     translations.nil? or translations.empty?
-  end
-
-  def generate_key_base
-    KeyGenerator.generate_key_base_from_file(@original_file_path, @extension)
   end
 
 ## not advised to use

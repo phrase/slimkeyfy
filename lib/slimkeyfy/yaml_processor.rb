@@ -4,14 +4,19 @@ class YamlProcessor
 
   attr_reader :yaml_output, :locale, :yaml_hash
 
-  def initialize(locale, yaml_output=nil)
-    @yaml_output = process_output_file(yaml_output)
+  def initialize(locale, key_base, yaml_output=nil)
     @locale = locale
-    @yaml_hash = {}
+    @key_base = key_base
+    @yaml_output = process_output_file(yaml_output)
+    @yaml_hash = load_hash
   end
 
   def process_output_file(yaml_output)
-    return nil if yaml_output.nil?
+    if yaml_output.nil? then
+      dir_of_key = @key_base.split(".").first
+      puts dir_of_key
+      return default_yaml(dir_of_key, @locale)
+    end
     path = MFileUtils.abs_path(yaml_output.to_s)
     if File.exist?(path) then 
       path
@@ -31,22 +36,15 @@ class YamlProcessor
     end
   end
 
-  def store!(key)
-    dir_of_key = key.split(".").first
-    valid_path = @yaml_output.nil? ? default_yaml(dir_of_key, @locale) : @yaml_output
+  def store!
     merged = {@locale => @yaml_hash}
-    if hash_loadable(valid_path) then
-      FileWriter.append(valid_path, merged[@locale][dir_of_key].to_yaml)
-    else
-      FileWriter.write(valid_path, merged.to_yaml)
-    end
+    FileWriter.write(@yaml_output, merged.to_yaml)
   end
 
-  def hash_loadable(valid_path)
-    if File.exist?(valid_path)
-      h = YAML::load_file(valid_path)
-      h ? true : false
-    else false end
+  def load_hash
+    h = YAML::load_file(@yaml_output)
+    if h then h[@locale]
+    else {} end
   end
 
   def default_yaml(key, locale)
@@ -143,6 +141,7 @@ class Hash
     h
   end
 end
+
 
 
 

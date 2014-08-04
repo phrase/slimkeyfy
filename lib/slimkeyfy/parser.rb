@@ -114,7 +114,7 @@ class SlimTransformer < Transformer
 end
 
 
-class ModelControllerTransformer < Transformer
+class ControllerTransformer < Transformer
   STRING = /(\".*\"|\'.*\')/
   TAGS = /(text|notice|message|alert|raise|subject|flash\[:[a-z]+\])/
   CONNECTING_SYMBOLS = /\s*(:|=>?)?\s*/
@@ -131,7 +131,6 @@ class ModelControllerTransformer < Transformer
     nil_elem
   end
 end
-
 
 class Word
   attr_reader :line, :tokens, :indentation
@@ -170,7 +169,7 @@ class Word
   end
 
   def update_translation_key_hash(yaml_processor, translation)
-    translation_key = TranslationKeyBuilder.new(translation).generate_key_name
+    translation_key = TranslationKeyGenerator.new(translation).generate_key_name
     translation_key_with_base = "#{@key_base}.#{translation_key}"
     translation_key_with_base, translation = yaml_processor.merge!(translation_key_with_base, translation) unless yaml_processor.nil?
     @translations.merge!({translation_key_with_base => translation})
@@ -180,38 +179,5 @@ class Word
   def extract_updated_key(translation_key_with_base)
     return "" if (translation_key_with_base.nil? or translation_key_with_base.empty?)
     translation_key_with_base.split(".").last
-  end
-end
-
-class TranslationKeyBuilder
-  VALID = /[^0-9a-z]/i
-  DEFAULT_KEY_NAME = "default_key"
-
-  def initialize(translation)
-    @translation = translation
-  end
-
-  def generate_key_name
-    normalized_translation = ""
-    if not (@translation.nil? or @translation.empty?) then
-      normalized_translation = @translation.gsub(VALID, "_").gsub(/[_]+/, "_").downcase
-      normalized_translation = normalized_translation.split("_")[0..3].join("_")
-    end
-    return DEFAULT_KEY_NAME if is_not_valid?(normalized_translation.strip)
-    strip_underscores(normalized_translation)
-  end
-
-  def is_not_valid?(normalized_translation)
-    (normalized_translation.strip == "_" or normalized_translation.empty?)
-  end
-
-  def strip_underscores(s)
-    if s.start_with?("_") then
-      s = s[1..-1]
-    end
-    if s.end_with?("_") then
-      s = s[0..-2]
-    end
-    s
   end
 end
