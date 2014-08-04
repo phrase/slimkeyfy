@@ -34,7 +34,6 @@ class Transformer
 end
 
 class SlimTransformer < Transformer
-  HTML_TAGS = /^(?<html_tag>\||[a-z]+[0-9]?)/
 
   BEFORE = /(?<before>.*)/
   TRANSLATION = /['"](?<translation>.*?)['"]/
@@ -100,9 +99,11 @@ class SlimTransformer < Transformer
   end
 
   def line_already_translated?(line, html_tag)
-    line.match(TRANSLATED) != nil and html_tag.match(/link_to/) != nil
+    line.match(TRANSLATED) != nil and html_tag.match(/link_to/) != nil # edge case... 
   end
 
+  HTML_TAGS = /^(?<html_tag>\||[a-z0-9.-]+)/
+  
   def to_equals_tag(s)
     s = s.gsub("|", "=")
     m = s.match(HTML_TAGS)

@@ -34,6 +34,13 @@ describe "SlimTransformer" do
         {"#{key_base}.hello_world" => " Hello World!"}]
       }
     end
+    context "with dotted html" do
+      let(:word){ Word.new("  aside.pointer Hello World!",key_base, extension) }
+      it {should == [
+        "  aside.pointer= t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
   end
 
   describe "with translated tags" do
