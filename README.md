@@ -1,4 +1,4 @@
-Slimkeyfy (0.0.5)
+Slimkeyfy (0.0.6)
 ========
 Extract rails i18n keys from slim partials and replace strings with t() method calls adding unique nested keys to selected .yml localization file.
 ```ruby
