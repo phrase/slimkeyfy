@@ -63,6 +63,19 @@ describe "SlimTransformer" do
       let(:word){ Word.new("  actions",key_base, extension) }
       it {should == [nil, nil]}
     end
+    context "with invalid line" do
+      let(:word){ Word.new('  - widget_text = "Use stuff for more stuff: #{stuff}"', key_base, extension) }
+      it { should == [nil, nil] }
+    end
+    context "it should not work with complex interpolated strings" do
+      let( :raw_input ) { '= f.input :is_plural, inline_label: "Enable pluralization for this key", hint: "#{link_to("What does that mean?", article_path(slug: "working-with-phrase/pluralization"), target: "_blank")}".html_safe'}
+      let(:word) { Word.new(raw_input,key_base, extension) }
+      let(:translated) { 
+        '= f.input :is_plural, inline_label: t(\'.enable_pluralization_for_this\'), hint: t(\'.link_to\')What does that mean?", article_path(slug: "working-with-phrase/pluralization"), target: "_blank")}".html_safe'
+      }
+      let(:word_translation) { {"key_base.new.enable_pluralization_for_this"=>"Enable pluralization for this key", "key_base.new.link_to"=>'#{link_to('} }
+      it { should == [ translated , word_translation] }
+    end
   end
 
   describe "when line starts with equal" do
@@ -93,23 +106,13 @@ describe "SlimTransformer" do
       it { should == [ translated , word_translation] }
     end
 
-    context "it should render too much with interpolated strings" do
-      let( :raw_input ) { '= f.input :is_plural, inline_label: "Enable pluralization for this key", hint: "#{link_to("What does that mean?", article_path(slug: "working-with-phrase/pluralization"), target: "_blank")}".html_safe'}
-      let(:word) { Word.new(raw_input,key_base, extension) }
-      let(:translated) { 
-        '= f.input :is_plural, inline_label: t(\'.enable_pluralization_for_this\'), hint: t(\'.link_to_what\')'
-      }
-      let(:word_translation) { {"key_base.new.enable_pluralization_for_this"=>"Enable pluralization for this key", "key_base.new.link_to_what"=>'#{link_to("What does that mean?", article_path(slug: "working-with-phrase/pluralization"), target: "_blank")}'} }
-      it { should == [ translated , word_translation] }
-    end
-
     context "iconified links with several translatable attributes should work" do
       let( :raw_input ) { '= link_to iconified("Hello World!", :pencil), title: "Hi there! How are, you?!", :translation_search => {:query => translation.translation_key.nil? ? "" : "\"#{translation.translation_key.name}\"" }), placeholder: "Hi there! How are, you?!", :class => "btn btn-default btn-sm tooltipped", hint: "Hi! What up?"'}
       let(:word) { Word.new(raw_input,key_base, extension) }
       let(:translated) { 
-        '= link_to iconified("Hello World!", :pencil), title: t(\'.hi_there_how_are\'), :translation_search => {:query => translation.translation_key.nil? ? "" : "\"#{translation.translation_key.name}\"" }), placeholder: t(\'.hi_there_how_are\'), :class => "btn btn-default btn-sm tooltipped", hint: t(\'.hi_what_up\')'
+        '= link_to iconified(t(\'.hello_world\'), :pencil), title: t(\'.hi_there_how_are\'), :translation_search => {:query => translation.translation_key.nil? ? "" : "\"#{translation.translation_key.name}\"" }), placeholder: t(\'.hi_there_how_are\'), :class => "btn btn-default btn-sm tooltipped", hint: t(\'.hi_what_up\')'
       }
-      let(:word_translation) { {"key_base.new.hi_there_how_are"=>"Hi there! How are, you?!", "key_base.new.hi_what_up"=>"Hi! What up?"} }
+      let(:word_translation) { {"key_base.new.hi_there_how_are"=>"Hi there! How are, you?!", "key_base.new.hi_what_up"=>"Hi! What up?", "key_base.new.hello_world" => "Hello World!"} }
       it { should == [ translated , word_translation] }
     end
 
@@ -153,6 +156,16 @@ describe "SlimTransformer" do
       let(:word) { Word.new(raw_input,key_base, extension) }
       let(:translated) {  "= small_button t('.upgrade_account'), blabla" }
       it { should == [ translated , {"key_base.new.upgrade_account"=>"Upgrade Account"}] }
+    end
+
+    context "when line contains a translatable submit_tag" do
+      let( :raw_input ) { "  = f.input :some_input, label: \"Your friends' emails\", hint: \"Separate multiple email addresses by comma\", input_html: {class: \"input-block-level\"}" }
+      let(:word) { Word.new(raw_input, key_base, extension) }
+      let(:translated) { "  = f.input :some_input, label: t('.your_friends_emails'), hint: t('.separate_multiple_email_addresses'), input_html: {class: \"input-block-level\"}" }
+      it { should == [ translated , 
+        {"key_base.new.your_friends_emails" => "Your friends' emails",
+         "key_base.new.separate_multiple_email_addresses" => "Separate multiple email addresses by comma"}]
+        }
     end
   end
 end

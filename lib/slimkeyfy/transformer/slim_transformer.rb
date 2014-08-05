@@ -1,18 +1,26 @@
 class SlimTransformer < BaseTransformer
 
-  HTML_TAGS = /^(?<html_tag>\||[a-z0-9.-]+)/
+  HTML_TAGS = /^(?<html_tag>\||([a-z\.]+[0-9\-]*)+)/
   BEFORE = /(?<before>.*)/
-  TRANSLATION = /['"](?<translation>.*?)['"]/
+  TRANSLATION = /(?<translation>(".*?"|'.*?'))/
   AFTER = /(?<after>,?.*)?/
   HTML_ARGUMENTS = {
-    hint: /#{BEFORE}(?<html_tag>hint:\s*)["'](?<translation>.*)["']/,
-    link_to: /#{BEFORE}(?<html_tag>link_to(\s[a-z]*)?\(?)#{TRANSLATION}#{AFTER}/,
-    inconified: /#{BEFORE}(?<html_tag>inconified\(\s*)#{TRANSLATION}#{AFTER}/,
-    placeholder: /#{BEFORE}(?<html_tag>placeholder:\s*)#{TRANSLATION}#{AFTER}/,
-    title: /#{BEFORE}(?<html_tag>title:\s*)#{TRANSLATION}#{AFTER}/,
-    label: /#{BEFORE}(?<html_tag>[a-z]*_?label:\s*)#{TRANSLATION}#{AFTER}/,
-    tag_input_button: /#{BEFORE}(?<html_tag>[a-z]*[\._]?(button|input|tag):?\s*)#{TRANSLATION}#{AFTER}/,
+    hint: /(?<html_tag>hint:\s*)/,
+    link_to: /(?<html_tag>link_to\s*\(?)/,
+    inconified: /(?<html_tag>(iconified\s*\(?))/,
+    placeholder: /(?<html_tag>placeholder:\s*)/,
+    title: /(?<html_tag>title:\s*)/,
+    label: /(?<html_tag>[a-z]*_?label:\s*)/,
+    tag_input_button: /(?<html_tag>[a-z]*[\._]?(button|input|tag):?\s*)/,
   }
+
+  def regex_list
+    HTML_ARGUMENTS.map{|_, regex| /#{BEFORE}#{regex}#{TRANSLATION}#{AFTER}/ }
+  end
+
+  def match_any_slim?(line)
+    regex_list.any?{ |regex| line.match(regex) }
+  end
 
   def transform
     return nil_elem if should_not_be_processed?(@word.as_list)
@@ -26,10 +34,6 @@ class SlimTransformer < BaseTransformer
     else nil_elem end
 
     result
-  end
-
-  def match_any_slim?(line)
-    HTML_ARGUMENTS.values.any?{ |regex| line.match(regex) }
   end
 
   def simple_html
@@ -47,11 +51,12 @@ class SlimTransformer < BaseTransformer
   end
 
   def parse_html_arguments(line)
-    HTML_ARGUMENTS.each do |key, regex|
+    puts regex_list
+    regex_list.each do |regex|
       m_data = nil
       m_data = line.match(regex)
       if m_data != nil then
-        before, html_tag, translation = m_data[:before], m_data[:html_tag], m_data[:translation]
+        before, html_tag, translation = m_data[:before], m_data[:html_tag], match_string(m_data[:translation])
         after = m_data.names.include?("after") ? m_data[:after] : ""
         
         next if line_already_translated?(line, html_tag)
