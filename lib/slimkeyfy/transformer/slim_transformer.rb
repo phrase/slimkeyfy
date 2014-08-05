@@ -55,11 +55,8 @@ class SlimTransformer < BaseTransformer
       m_data = nil
       m_data = line.match(regex)
       if m_data != nil then
-        before, html_tag, translation = m_data[:before], m_data[:html_tag], match_string(m_data[:translation])
-        after = m_data.names.include?("after") ? m_data[:after] : ""
-        
-        next if line_already_translated?(line, html_tag)
-
+        before, html_tag = m_data[:before], m_data[:html_tag]
+        translation, after = match_string(m_data[:translation]), m_data[:after]
         translation_key = update_hashes(translation)
         line = "#{before}#{html_tag}#{translation_key}#{after}"
       end

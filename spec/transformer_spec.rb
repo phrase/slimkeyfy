@@ -54,7 +54,7 @@ describe "SlimTransformer" do
 
     context "with valid tag and nothing to translate" do
       let(:word){ Word.new("= link_to 'blubb', hint: t '.actions' ", key_base, extension) }
-      it {should == ["= link_to 'blubb', hint: t '.actions' ", {}]}
+      it {should == ["= link_to t('.blubb'), hint: t '.actions' ", {"key_base.new.blubb"=>"blubb"}]}
     end
   end
 
