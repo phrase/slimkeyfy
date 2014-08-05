@@ -51,7 +51,6 @@ class SlimTransformer < BaseTransformer
   end
 
   def parse_html_arguments(line)
-    puts regex_list
     regex_list.each do |regex|
       m_data = nil
       m_data = line.match(regex)
