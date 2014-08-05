@@ -1,5 +1,3 @@
-
-
 class BaseKeyGenerator
   def self.generate_key_base_from_path(file_path, file_extension)
     key_name = case file_extension
@@ -30,7 +28,6 @@ class BaseKeyGenerator
     strip_dirs_and_file[0..-2].join(".")
   end
 end
-
 
 class TranslationKeyGenerator
   VALID = /[^0-9a-z]/i

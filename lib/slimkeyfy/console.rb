@@ -77,7 +77,7 @@ class CommandLine
   end
 
   def helpful_exit
-    puts "Please provide a path to .slims, a yaml localization file and a locale name. See -h for more information."
+    puts "Please provide a path to .slims and a locale name. See -h for more information."
     exit
   end
 
@@ -150,6 +150,4 @@ class CommandLine
       MFileUtils.restore(translate_slim.bak_path, translate_slim.original_file_path)
     end
   end
-
 end
-

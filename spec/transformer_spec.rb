@@ -1,4 +1,7 @@
-require_relative '../lib/slimkeyfy/parser'
+require_relative '../lib/slimkeyfy/transformer/base_transformer'
+require_relative '../lib/slimkeyfy/transformer/word'
+require_relative '../lib/slimkeyfy/transformer/slim_transformer'
+require_relative '../lib/slimkeyfy/transformer/controller_transformer'
 
 describe "SlimTransformer" do
   let( :key_base ) { "key_base.new"}

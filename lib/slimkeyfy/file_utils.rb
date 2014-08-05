@@ -17,7 +17,7 @@ class MFileUtils
   end
   def self.create_new_file(input)
     new_file_path = self.abs_path(input)
-    FileWriter.overwrite(new_file_path)
+    FileWriter.write(new_file_path, "")
     new_file_path
   end
   def self.abs_path(file)
@@ -40,7 +40,6 @@ class MFileUtils
   end
 end
 
-
 class FileReader
   def self.read(file)
     File.read(File.expand_path(file))
@@ -48,9 +47,6 @@ class FileReader
 end
 
 class FileWriter
-  def self.overwrite(full_path, content="")
-    self.write(full_path, content)
-  end
   def self.write(full_path, content)
     File.open(full_path, "w+") { |f| f.write(content) }
   end
@@ -58,4 +54,3 @@ class FileWriter
     open(full_path, 'a') { |f| f.puts content}
   end
 end
-
