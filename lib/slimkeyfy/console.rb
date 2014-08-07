@@ -87,9 +87,6 @@ class CommandLine
       puts opts
       exit
     end
-    opts.on_tail('-d', '--diff', 'Uses unix diff or colordiff for full file comparison') do
-      @options[:diff] = true
-    end
     opts.on_tail('-r', '--recursive', 'If a directory is given all subdirectories will be walked either. 
       Without -r and a directory just the files within the first level are walked.') do
       @options[:recursive] = true
@@ -136,16 +133,8 @@ class CommandLine
 
     puts "file=#{@options[:input]}"
     translate_slim = Translate.new(@options)
-    rescue_on_exit(translate_slim)
-  end
-
-  def rescue_on_exit(translate_slim)
     begin
-      if @options[:diff] then
-        translate_slim.unix_diff_mode
-      else
-        translate_slim.stream_mode
-      end
+      translate_slim.stream_mode
     rescue Interrupt
       MFileUtils.restore(translate_slim.bak_path, translate_slim.original_file_path)
     end

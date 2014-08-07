@@ -66,12 +66,7 @@ class Translate
   end
 
   def tag(old_line, translations)
-    delim = "<#{"="*50}>"
-    temp = translations.map{ |k, v| 
-      dir, file, name = k.split(".")
-      "#{dir}.#{file} | #{name}: #{v} | t('.#{name}')"
-    }
-    "#{delim}\n#{old_line}\n#{temp}\n#{delim}"
+    "#{old_line}\n#{">"*15}\n#{translations.map{|k, v| "#{k}: #{v}, t('.#{k.split(".").last}')" }.join(" | ")}"
   end
 
   def finalize!
@@ -96,30 +91,4 @@ class Translate
   def translations_are_invalid?(translations)
     translations.nil? or translations.empty?
   end
-
-## not advised to use
-  def unix_diff_mode
-    @content.each do |old_line|
-      word = Word.new(old_line, @key_base, @extension)
-      new_line, translations = @transformer.new(word, @yaml_processor).transform
-      if translations_are_invalid?(translations)
-        delete_translations(translations)
-        @new_content << old_line
-      else
-        @new_content << new_line
-        @changes = true
-      end
-    end
-    process_unix_diff
-  end
-
-  def process_unix_diff
-    FileWriter.write(@file_path, @new_content.join("\n"))
-    ConsolePrinter.unix_diff(@bak_path, @file_path)
-    finalize!
-  end
 end
-
-
-
-
