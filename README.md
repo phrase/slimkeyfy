@@ -1,6 +1,6 @@
-Slimkeyfy (0.0.6)
+Slimkeyfy
 ========
-Extract plain Strings from .slim views and rails controllers to replace them with I18n's t() method. Keys and .yml output files will be automatically generated and filled in.
+Extract plain Strings from .slim views and rails controllers to replace them with I18n's t() method. Keys with it's translations will be streamed to a .yml output.
 ```ruby
 slimkeyfy app/views/users/show.html.slim en
 # users/show.html.slim
@@ -20,40 +20,43 @@ Install
 git clone https://github.com/phrase/slimkeyfy.git 
 cd slimkeyfy
 gem build slimkeyfy.gemspec
-gem install slimkeyfy-0.0.5.gem
+gem install slimkeyfy-0.0.6.gem
 # Later: gem install slimkeyfy
 ```
 
 Approach
 --------
-The current approach goes for a 80/20 solution. Localizing files is extremely error prone so I decided that the user should verify each change. That means that you will be prompted for each possible translation to choose whether you like to keep it, to ignore it or to tag it. In the future it might be possible to parse the 80% automatically and ask for the 20% in return. The collected data is then processed into a yaml file. If you don't provide a yaml one will be created at configs/locales/view_folder_name.locale.yml. All your processed views will be merged with the given one.
+The current approach goes for a 80/20 solution. Tagging strings in html with translation tags is extremely error prone so I decided that the user should verify each change. That means that you will be prompted for each possible translation to choose whether you like to keep it, to ignore it or to tag it. The collected data is then processed into a yaml file. If you don't provide a yaml  one will be created. All your processed views and resulting translations will be merged with the existing.
+
+Suggested Approach
+-----------------
+As HTML is not 100% parsable there will be errors in the conversion. To minimize your error rate I suggest to approach each view or view_folder individually. The i18n-tasks gem helped a lot by finding errors. Always double check your views and make sure that everything went smoothly. Especially double check all your links.
 
 Usage
 -----
 ```unix
-slimkeyfy INPUT_FILENAME_OR_DIRECTORY LOCALE (e.g. en, fr) [LOCALIZATION_YAML_FILE] [Options]
+slimkeyfy INPUT_FILENAME_OR_DIRECTORY LOCALE (e.g. en, fr) [YAML_FILE] [Options]
 ```
+- If you do not provide a yaml_file - one will be created at configs/locales/view_folder_name.locale.yml. 
+- If you provide one make sure that the top level locale matches your provided locale
+
 Two modes are supported:
 
-1. **Stream** - **recommended** - default mode, walks through the given file/files and if an untagged plain string is found you are prompted to apply (y)es, discard (n)o, tag (x) if you would like it to be marked for later (like a git conflict) or to (a)bort (only aborts the current file process).
+1. **Stream** - **recommended** - default mode, walks through the given file/files and if a regex hits you will be prompted to apply (y)es, discard (n)o, tag (x) (like a git conflict with information) or (a)bort (only aborts the current file).
 
-2. **Diff** - **currently not recommended** - Applies all changes and uses colordiff or diff to show any changes between the files. Faster if you do not like to approve every single matching line. It is also more error prone because some faulty translations will be translated nonetheless. In the future it might be possible to parse 80% for sure and be prompted about the 20%.
+2. **Diff** - **currently not recommended** - Applies all changes and uses colordiff or diff to show any changes between the files. Faster if you do not like to approve every single matching line. It is also more error prone because some faulty translations will be translated nonetheless.
 
 default stream mode
 ```unix
 slimkeyfy path/to/your/file.html.slim en
 ```
-default stream mode with given yml file
+default stream mode with given yml file (has to be valid yaml! with the top level locale matching your provided locale)
 ```unix
 slimkeyfy path/to/your/dir/ en path/to/your/en.yml
 ```
 unix_diff with -d --diff
 ```unix
 slimkeyfy path/to/your/file.html.slim path/to/your/en.yml en --diff
-```
-recursively walks through all files from a given dir -r --recursive
-```unix
-slimkeyfy path/to/your/dir/ path/to/your/en.yml en --recursive
 ```
 A Backup (.bak) of the old file will be created e.g. index.html.slim => index.html.slim.bak
 
@@ -130,14 +133,21 @@ Now that you processed your views and moved the generated keys to your localizat
 ```
 If you are already familiar with the PhraseApp gem you can upload your translation/localization files now (normally found in app_folder/config/locales/ or app_folder/phrase/locales/. Otherwise have a look at our [detailed guide](https://phraseapp.com/docs/about/access-your-locale-files-with-the-api-client?language=en).
 
+Todo
+----
+- Yaml placeholders are currently not supported (I am working on it!).
+- a lot of regexp can be added or extended
+- whitespace handling is currently very simple (fills translations with whitespaces)
+- currently you are prompted for all hits - I would like to do 70-80% automatically and prompt for the 20-30% that cannot be decided upon.
+- a dry run option where you can see what will happen if you convert.
+- Options/flags (no_backup_creation, dry_run) 
+
+Issues
+------
+- If you choose to take a lot of files at one time make sure to go through with it. It is not an issue to completely rerun everything (already translated strings are ignored) but should be avoided.
+- some hits will not be correct, some things that should be found are not and sometimes the regex engine won't work for mysterious reasons. Slimkeyfy is a helper, it does not provide full automatization. It might make your work a little easier.
 
 Helpful Information
 -------------------
 * Other tools, not slim specific for this task is the [i15r gem](https://github.com/balinterdi/i15r). It can process .haml and .erb.
 * I strongly recommend checking your translated app with the [i18n-tasks gem](https://github.com/glebm/i18n-tasks). It is a great tool in     finding missing and unused translations.
-
-Issues
-------
-
-1. Recursively updating can be dangerous as there are moments (ctrl + c) where you can corrupt a file. Normally this only affects the file currently processed.
-2. If you choose to take a lot of files at one time make sure to go through with it. It is not an issue to completely rerun everything (already translated strings are ignored) but should be avoided.
