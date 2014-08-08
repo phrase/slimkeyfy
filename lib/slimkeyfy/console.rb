@@ -82,15 +82,23 @@ class CommandLine
   end
 
   def opt_scan(opts)
-    opts.banner = "Usage: slimkeyfy INPUT_FILENAME_OR_DIRECTORY LOCALE [YAML_FILE] [Options]
-      e.g. slimkeyfy #{"app/views/users/".green} #{"en".red} #{"phrase/locales/en.yml".yellow} [Options]
-    "
+    opts.banner = 
+"Usage: slimkeyfy #{"INPUT_FILENAME_OR_DIRECTORY".green} #{"LOCALE".red} #{"[YAML_FILE]".yellow} [Options]
+  e.g. slimkeyfy #{"app/views/users/".green} #{"en".red} #{"phrase/locales/en.yml".yellow} [Options]
+
+Description: Extract plain Strings from .slim views and Rails controllers to 
+  replace them with I18n's t() method. Keys with it's translations will be streamed 
+  to a YAML file.
+
+  the following options are available:
+
+"
     opts.on_tail('-h', '--help', 'Show this message') do
       puts opts
       exit
     end
     opts.on_tail('-r', '--recursive', 'If a directory is given all subdirectories will be walked either. 
-      Without -r and a directory just the files within the first level are walked.') do
+                                      Without -r and a directory just the files within the first level are walked.') do
       @options[:recursive] = true
     end
   end
