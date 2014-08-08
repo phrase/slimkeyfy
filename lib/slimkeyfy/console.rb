@@ -73,7 +73,7 @@ end
 
 class CommandLine
   def initialize(args)
-    helpful_exit if ARGV.size < 1
+    helpful_exit if ARGV.size < 2
     @options = {}
     @args = args
     OptionParser.new(&method(:opt_scan)).parse!(@args)
@@ -113,10 +113,10 @@ class CommandLine
 
   def main
     @options[:input] = input = @args.shift
-    @options[:locale] = @args.shift
+    @options[:locale] = locale = @args.shift
     @options[:yaml_output] = @args.shift
 
-    helpful_exit if input.nil?
+    helpful_exit if (input.nil? or locale.nil?)
 
     if File.directory?(input) then
       directory_translate(input)
