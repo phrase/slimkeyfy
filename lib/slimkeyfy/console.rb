@@ -82,7 +82,9 @@ class CommandLine
   end
 
   def opt_scan(opts)
-    opts.banner = "Usage: slimkeyfy INPUT_FILENAME_OR_DIRECTORY LOCALE [YAML_FILE] [Options]"
+    opts.banner = "Usage: slimkeyfy INPUT_FILENAME_OR_DIRECTORY LOCALE [YAML_FILE] [Options]
+      e.g. slimkeyfy #{"app/views/users/".green} #{"en".red} #{"phrase/locales/en.yml".yellow} [Options]
+    "
     opts.on_tail('-h', '--help', 'Show this message') do
       puts opts
       exit
