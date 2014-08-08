@@ -26,7 +26,7 @@ gem install slimkeyfy-0.0.6.gem
 
 Approach
 -
-Most of the time tools like this go for a 80/20 approach stating that 80% can be done right and 20% have to be done manually. Our approach is similar but a bit different. Translating and tagging your Rails app can be error prone. In order to reduce this Slimkeyfy streams in every line that matches the regular expression engine and prompts you to take an action. This guarantees a higher quality but also gets us closer to the 90%. It might take a little more time than full automation. The collected data is then processed into a YAML file. If you don't provide a YAML one will be created. All your processed views and resulting translations will be merged with the existing.
+Most of the time tools like this go for a 80/20 approach stating that 80% can be done right and 20% have to be done manually. Our approach is similar but a bit different. Translating and tagging your Rails app can be error prone. In order to reduce this Slimkeyfy streams in every line that matches the regular expression engine and prompts you to take an action. This guarantees a higher quality but also gets us closer to the 90%. It might take a little more time than full automation. The collected data is then processed into a YAML file. If you don't provide a YAML one will be created. All your processed views and resulting translations will be merged with the existing YAML.
 
 Usage
 -
@@ -35,6 +35,7 @@ slimkeyfy INPUT_FILENAME_OR_DIRECTORY LOCALE (e.g. en, fr) [YAML_FILE] [Options]
 ```
 - If you do not provide a YAML file - one will be created at configs/locales/view_folder_name.locale.yml
 - If you provide one make sure that the top level locale matches your provided locale
+- The YAML file will be loaded as a hash and deep_merged with the new found translations
 
 **Stream** - walks through the given file/files and if a regex hits you will be prompted to apply (y)es, discard (n)o, tag (x) (like a git conflict with information) or (a)bort (only aborts the current file).
 
@@ -70,10 +71,10 @@ your_app_name/
 > pwd
 ../your_app_name/
  
-> slimkeyfy app/views/user/ en
+> slimkeyfy app/views/users/ en
 ... choose your changes here (y/n/x/a)
 
-> ls app/views/user/
+> ls app/views/users/
     new.html.slim
     show.html.slim
     new.html.slim.bak
@@ -83,10 +84,10 @@ your_app_name/
     user.en.yml
     en.yml
     
-> cat ../user/new.html.slim.bak
+> cat ../users/new.html.slim.bak
   h1 Hello World!
     
-> cat ../user/new.html.slim
+> cat ../users/new.html.slim
   h1= t('.hello_world')
  
 > cat config/locales/en.yml
@@ -94,10 +95,10 @@ your_app_name/
   en:
     keys..
           
-> cat config/locales/user.en.yml
+> cat config/locales/users.en.yml
   ---
   en:
-    user:
+    users:
       new:
         hello_world: Hello World!
       show:
@@ -108,22 +109,23 @@ Suggested Workflow
 As HTML is not 100% parsable there will be errors in the conversion. To minimize your error rate I suggest to approach each view or view_folder individually. The i18n-tasks gem helped a lot by finding errors. Always double check your views and make sure that everything went smoothly. Especially double check all your links. Here is an example workflow:
 ```ruby
 # 1. create a branch for a view folder 
-> git checkout -b branch_localization
+> git checkout -b users_localization
 
 # 2. slimkeyfy the view folder you would like to tag
-> slimkeyfy app/views/folder/ locale
+> slimkeyfy app/views/users/ en
 
 # 3. go through all files and verify/add missing translations 
 # (check against the .bak files (use git diff))
-> git diff app/views/folder/views.html.slim
+> git diff app/views/users/views.html.slim
 
 # 4. add your translations + keys to your locale file(s)
 # 4.1 optional: Use the I18n-tasks gem to find missing translations
 
 # 5. go through all your views and click through everything to actually "see" what changed
 
-# 6. If everything is fine - clean up (remove .baks, remove temporary YAML files)
-> rm app/views/folder/*.bak
+# 6. If everything is fine - clean up (remove .baks)
+> rm app/views/users/*.bak
+# Optional: remove temporary YAML files
 > rm config/locales/users.en.yml
 ```
 Testing
