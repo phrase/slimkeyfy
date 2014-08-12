@@ -106,7 +106,7 @@ your_app_name/
 ```
 Suggested Workflow
 -
-As HTML is not 100% parsable there will be errors in the conversion. To minimize your error rate I suggest to approach each view or view_folder individually. The i18n-tasks gem helped a lot by finding errors. Always double check your views and make sure that everything went smoothly. Especially double check all your links. Here is an example workflow:
+As HTML is not 100% parsable there will be errors in the conversion. To minimize your error rate we suggest to approach each view or view_folder individually. The i18n-tasks gem helped a lot by finding errors. Always double check your views and make sure that everything went smoothly. Especially double check all your links. Here is an example workflow:
 ```ruby
 # 1. create a branch for a view folder 
 > git checkout -b users_localization
@@ -145,8 +145,8 @@ If you are already familiar with the PhraseApp gem you can upload your translati
 
 Todo
 -
-- YAML placeholders are currently not supported (I am working on it!).
-- currently you are prompted for all hits - I would like to do 70-80% automatically and prompt for the 20-30% that cannot be decided upon.
+- YAML placeholders are currently not supported (We are working on it!).
+- currently you are prompted for all hits - We would like to do 70-80% automatically and prompt for the 20-30% that cannot be decided upon.
 - adding / generalizing Regular Expressions for better hit rate
 - a dry run option where you can see what will happen if you convert.
 - Options/flags (no_backup_creation, dry_run) 
@@ -157,8 +157,9 @@ Issues
 - If you choose to take a lot of files at one time make sure to go through with it. It is not an issue to completely rerun everything (already translated strings are ignored) but should be avoided.
 - some hits will not be correct, some things that should be found are not and sometimes the regex engine won't work for mysterious reasons. Slimkeyfy is a helper, it does not provide full automation. It might make your work a little easier.
 
-Helpful Information
+References
 -
 * Other tools, not slim specific for this task is the [i15r gem](https://github.com/balinterdi/i15r). It can process .haml and .erb.
 * I strongly recommend checking your translated app with the [i18n-tasks gem](https://github.com/glebm/i18n-tasks). It is a great tool in     finding missing and unused translations.
 * Always consult the [Official Rails Internationalization guide](http://guides.rubyonrails.org/i18n.html) if in doubt.
+* Visit [PhraseApp on Github](https://github.com/phrase/phrase)
