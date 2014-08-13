@@ -6,10 +6,10 @@ class SlimKeyfy::Translate
     @extension = options[:ext]
     @transformer = transformer
     @original_file_path = options[:input]
-    @bak_path = MFileUtils.backup(@original_file_path)
-    @content = FileReader.read(@bak_path).split("\n")
-    @file_path = MFileUtils.create_new_file(@original_file_path)
-    @key_base = BaseKeyGenerator.generate_key_base_from_path(@original_file_path, @extension)
+    @bak_path = SlimKeyfy::MFileUtils.backup(@original_file_path)
+    @content = SlimKeyfy::FileReader.read(@bak_path).split("\n")
+    @file_path = SlimKeyfy::MFileUtils.create_new_file(@original_file_path)
+    @key_base = SlimKeyfy::BaseKeyGenerator.generate_key_base_from_path(@original_file_path, @extension)
     @yaml_processor = create_yaml_processor(options)
     @new_content = []
     @changes = false
@@ -17,9 +17,9 @@ class SlimKeyfy::Translate
 
   def transformer
     if @extension == "slim" then
-      SlimTransformer
+      SlimKeyfy::Transformer::SlimTransformer
     elsif @extension == "rb" then
-      ControllerTransformer
+      SlimKeyfy::Transformer::ControllerTransformer
     else
       puts "Unknown extension type!"
       exit
@@ -28,13 +28,13 @@ class SlimKeyfy::Translate
 
   def create_yaml_processor(options)
     options[:yaml_output] ? 
-      YamlProcessor.new(options[:locale], @key_base, options[:yaml_output]) : 
-        YamlProcessor.new(options[:locale], @key_base)
+      SlimKeyfy::YamlProcessor.new(options[:locale], @key_base, options[:yaml_output]) : 
+        SlimKeyfy::YamlProcessor.new(options[:locale], @key_base)
   end
 
   def stream_mode
     @content.each_with_index do |old_line, idx|
-      word = Word.new(old_line, @key_base, @extension)
+      word = SlimKeyfy::Transformer::Word.new(old_line, @key_base, @extension)
       new_line, translations = @transformer.new(word, @yaml_processor).transform
       if translations_are_invalid?(translations)
         @yaml_processor.delete_translations(translations)
@@ -44,13 +44,13 @@ class SlimKeyfy::Translate
         @changes = true
       end
     end
-    FileWriter.write(@file_path, @new_content.join("\n"))
+    SlimKeyfy::FileWriter.write(@file_path, @new_content.join("\n"))
     finalize!
   end
 
   def process_new_line(idx, old_line, new_line, translations)
-    ConsolePrinter.difference(old_line, new_line, translations)
-    case IOAction.choose("Changes wanted?")
+    SlimKeyfy::ConsolePrinter.difference(old_line, new_line, translations)
+    case SlimKeyfy::IOAction.choose("Changes wanted?")
       when "y" then update_with(idx, new_line)
       when "n" then 
         update_with(idx, old_line)
@@ -59,7 +59,7 @@ class SlimKeyfy::Translate
         update_with(idx, tag(old_line, translations))
         @yaml_processor.delete_translations(translations)
       when "a" then
-        MFileUtils.restore(@bak_path, @original_file_path)
+        SlimKeyfy::MFileUtils.restore(@bak_path, @original_file_path)
         puts "Aborted!"
         exit
     end
@@ -77,15 +77,15 @@ class SlimKeyfy::Translate
 
   def finalize!
     if @changes then
-      if IOAction.yes_or_no?("Do you like what you see?") then
+      if SlimKeyfy::IOAction.yes_or_no?("Do you like what you see?") then
         @yaml_processor.store!
         puts "Processed!"
       else
-        MFileUtils.restore(@bak_path, @original_file_path)
+        SlimKeyfy::MFileUtils.restore(@bak_path, @original_file_path)
         puts "Restored!"
       end
     else 
-      MFileUtils.restore(@bak_path, @original_file_path)
+      SlimKeyfy::MFileUtils.restore(@bak_path, @original_file_path)
       puts "Nothing was changed!" 
     end
   end

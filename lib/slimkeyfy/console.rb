@@ -129,7 +129,7 @@ class SlimKeyfy::CommandLine
 
   def directory_translate(input)
     rec = @options.fetch(:recursive, false)
-    MFileUtils.walk(input, rec).each do |rec_input|
+    SlimKeyfy::MFileUtils.walk(input, rec).each do |rec_input|
       if File.file?(rec_input) and is_valid_ext?(rec_input) then
         @options[:input] = rec_input
         translate
@@ -142,18 +142,18 @@ class SlimKeyfy::CommandLine
   end
 
   def translate
-    @options[:ext] = ext = MFileUtils.file_extension(@options[:input])
+    @options[:ext] = ext = SlimKeyfy::MFileUtils.file_extension(@options[:input])
     unless is_valid_ext?(ext) then
       puts "invalid Input with extension #{ext}"
       return
     end
 
     puts "file=#{@options[:input]}"
-    translate_slim = Translate.new(@options)
+    translate_slim = SlimKeyfy::Translate.new(@options)
     begin
       translate_slim.stream_mode
     rescue Interrupt
-      MFileUtils.restore(translate_slim.bak_path, translate_slim.original_file_path)
+      SlimKeyfy::MFileUtils.restore(translate_slim.bak_path, translate_slim.original_file_path)
     end
   end
 end

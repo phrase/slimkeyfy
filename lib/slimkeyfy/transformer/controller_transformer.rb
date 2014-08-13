@@ -1,4 +1,4 @@
-class ControllerTransformer < BaseTransformer
+class SlimKeyfy::Transformer::ControllerTransformer < SlimKeyfy::Transformer::BaseTransformer
   TAGS = /(text|notice|message|alert|raise|subject|flash\[:[a-z]+\])/
   CONNECTING_SYMBOLS = /\s*(:|=>?)?\s*/
   REGEX = /(?<tag>#{TAGS}#{CONNECTING_SYMBOLS})(?<translation>#{STRING})/

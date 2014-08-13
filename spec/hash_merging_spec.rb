@@ -1,4 +1,4 @@
-require_relative '../lib/slimkeyfy/hash_merging'
+require_relative '../lib/slimkeyfy/'
 
 describe "Merger" do
   let ( :translation_hash ) { {"z" => {"y" => {"a" => 1}, "x" => {"a1" => 2, "a" => 1}}} }

@@ -1,4 +1,4 @@
-class BaseTransformer
+class SlimKeyfy::Transformer::BaseTransformer
   TRANSLATED = /t\s*\(?\s*(".*?"|'.*?')\s*\)?/
   STRING = /(\".*\"|\'.*\')/
   STRING_WITHOUT_QUOTES = /("(?<double_quot>.*)"|'(?<single_quot>.*)')/

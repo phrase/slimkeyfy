@@ -1,4 +1,4 @@
-require_relative '../lib/slimkeyfy/key_generator'
+require_relative '../lib/slimkeyfy/'
 
 
 describe "BaseKeyGenerator" do

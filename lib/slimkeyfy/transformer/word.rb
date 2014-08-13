@@ -1,4 +1,4 @@
-class Word
+class SlimKeyfy::Transformer::Word
   attr_reader :line, :tokens, :indentation
   attr_accessor :translations
 

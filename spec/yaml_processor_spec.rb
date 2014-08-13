@@ -1,5 +1,4 @@
-require_relative '../lib/slimkeyfy/yaml_processor'
-require_relative '../lib/slimkeyfy/file_utils'
+require_relative '../lib/slimkeyfy/'
 
 describe "yaml_processor" do
   describe "should render locale yaml file properly" do

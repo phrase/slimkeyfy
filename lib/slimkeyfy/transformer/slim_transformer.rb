@@ -1,6 +1,6 @@
-class SlimTransformer < BaseTransformer
+class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTransformer
 
-  HTML_TAGS = /^(?<html_tag>\||([a-z\.]+[0-9\-]*)+)/
+  HTML_TAGS = /^(?<html_tag>'|\||([a-z\.]+[0-9\-]*)+)/
   BEFORE = /(?<before>.*)/
   TRANSLATION = /(?<translation>(".*?"|'.*?'))/
   AFTER = /(?<after>,?.*)?/
@@ -19,7 +19,7 @@ class SlimTransformer < BaseTransformer
   end
 
   def match_any_slim?(line)
-    regex_list.any?{ |regex| line.match(regex) }
+    line.match(/(?<before>.*=.*)/)
   end
 
   def transform
@@ -33,6 +33,8 @@ class SlimTransformer < BaseTransformer
       simple_html
     else nil_elem end
 
+    return nil_elem if result.last.empty?
+
     result
   end
 
@@ -40,7 +42,14 @@ class SlimTransformer < BaseTransformer
     return nil_elem if @word.line.match(TRANSLATED)
 
     tagged_with_equals = to_equals_tag(@word.head)
-    translation = convert_html_whitespace(match_string(@word.tail.join(" ")))
+
+    body = @word.tail.join(" ")
+    if body.match(/(?<html_tag>link_to\s*\(?)(?<translation>(".*?"|'.*?'))/) != nil then
+      translation = link_tos(body)
+    else
+      translation = convert_html_whitespace(match_string(body))
+    end
+    
     translation_key = update_hashes(translation)
     normalize_translation("#{tagged_with_equals} #{translation_key}")
   end
@@ -52,28 +61,35 @@ class SlimTransformer < BaseTransformer
 
   def parse_html_arguments(line)
     regex_list.each do |regex|
-      m_data = nil
-      m_data = line.match(regex)
-      if m_data != nil then
-        before, html_tag = m_data[:before], m_data[:html_tag]
-        translation, after = match_string(m_data[:translation]), m_data[:after]
+      line.scan(regex) do |m_data|
+        before, html_tag = m_data[0], m_data[1]
+        translation, after = match_string(m_data[2]), m_data[3]
         translation_key = update_hashes(translation)
         line = "#{before}#{html_tag}#{translation_key}#{after}"
       end
     end
     line
   end
-
-  def line_already_translated?(line, html_tag)
-    line.match(TRANSLATED) != nil and html_tag.match(/link_to/) != nil # edge case... 
-  end
   
   def to_equals_tag(s)
-    s = s.gsub("|", "=")
+    s = s.gsub(/[\|']/, "=")
     m = s.match(HTML_TAGS)
     return s if m.nil? or m[:html_tag].nil?
     return s if has_equals_tag(s, m[:html_tag])
     s.gsub(m[:html_tag], "#{m[:html_tag]}=")
+  end
+
+  def link_tos(line)
+    r = /(?<html_tag>link_to\s*\(?)(?<translation>(".*?"|'.*?'))/
+    m = line.match(r)
+    if m != nil then
+      _, translation = m[:html_tag], match_string(m[:translation])
+      translation_key = update_hashes(translation)
+      line = line.gsub(m[:translation], translation_key)
+      link_tos(line)
+    else
+      line
+    end
   end
 
   def has_equals_tag(s, html_tag)

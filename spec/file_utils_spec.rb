@@ -1,4 +1,4 @@
-require_relative '../lib/slimkeyfy/file_utils'
+require_relative '../lib/slimkeyfy/'
 
 describe "FileUtils" do
 
