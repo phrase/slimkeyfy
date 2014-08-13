@@ -1,7 +1,7 @@
 require 'find'
 require 'fileutils'
 
-class MFileUtils
+class SlimKeyfy::MFileUtils
   def self.restore(backup_path, original_file_path)
     FileUtils.cp(backup_path, original_file_path)
     FileUtils.rm(backup_path)
@@ -40,13 +40,13 @@ class MFileUtils
   end
 end
 
-class FileReader
+class SlimKeyfy::FileReader
   def self.read(file)
     File.read(File.expand_path(file))
   end
 end
 
-class FileWriter
+class SlimKeyfy::FileWriter
   def self.write(full_path, content)
     File.open(full_path, "w+") { |f| f.write(content) }
   end

@@ -1,6 +1,6 @@
 require 'optparse'
 
-class ConsolePrinter
+class SlimKeyfy::ConsolePrinter
   def self.difference(old_line, new_line, translations)
     puts "#{'-'.red} #{normalize(old_line).red}"
     puts "#{'+'.green} #{normalize(new_line).green} => #{translations.to_s.yellow}"
@@ -39,7 +39,7 @@ class String
   end
 end
 
-class IOAction
+class SlimKeyfy::IOAction
   def self.yes_or_no?(msg)
     puts "#{msg} (y|n)"
     arg = STDIN.gets.chomp
@@ -71,15 +71,14 @@ class IOAction
 end
 
 
-class CommandLine
+class SlimKeyfy::CommandLine
   def initialize(args)
-    helpful_exit if ARGV.size < 2
     @options = {}
     @args = args
     OptionParser.new(&method(:opt_scan)).parse!(@args)
   end
 
-  def helpful_exit
+  def wrong_usage
     puts "Please provide a path to .slims and a locale name. See -h for more information."
     exit
   end
@@ -116,7 +115,7 @@ class CommandLine
     @options[:locale] = locale = @args.shift
     @options[:yaml_output] = @args.shift
 
-    helpful_exit if (input.nil? or locale.nil?)
+    wrong_usage if (input.nil? or locale.nil?)
 
     if File.directory?(input) then
       directory_translate(input)

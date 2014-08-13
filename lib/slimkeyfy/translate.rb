@@ -1,4 +1,4 @@
-class Translate
+class SlimKeyfy::Translate
 
   attr_reader :original_file_path, :bak_path
 

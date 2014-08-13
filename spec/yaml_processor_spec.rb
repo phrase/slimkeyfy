@@ -6,7 +6,7 @@ describe "yaml_processor" do
     let ( :file ) { "./spec/test_files/en.yml" }
     let ( :locale ) { "en" }
     let ( :key_base ) { "some_key.new" }
-    let ( :yaml_processor ) { YamlProcessor.new(locale, key_base, file) }
+    let ( :yaml_processor ) { SlimKeyfy::YamlProcessor.new(locale, key_base, file) }
 
     context "yaml_hash should loose top level locale name" do
       subject { yaml_processor.yaml_hash }

@@ -1,4 +1,4 @@
-class Merger
+class SlimKeyfy::Merger
   def self.merge_hashes(old_translations={}, new_translations={})
     key = new_translations.keys.first
     new_translations[key].keys.each do |top_key|

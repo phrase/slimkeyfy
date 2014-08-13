@@ -1,4 +1,4 @@
-class BaseKeyGenerator
+class SlimKeyfy::BaseKeyGenerator
   def self.generate_key_base_from_path(file_path, file_extension)
     key_name = case file_extension
       when "slim" then 
@@ -29,7 +29,7 @@ class BaseKeyGenerator
   end
 end
 
-class TranslationKeyGenerator
+class SlimKeyfy::TranslationKeyGenerator
   VALID = /[^0-9a-z]/i
   DEFAULT_KEY_NAME = "default_key"
 

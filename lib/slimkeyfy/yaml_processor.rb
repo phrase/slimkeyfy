@@ -1,6 +1,6 @@
 require 'yaml'
 
-class YamlProcessor
+class SlimKeyfy::YamlProcessor
 
   attr_reader :locale, :yaml_output, :yaml_hash
 
@@ -41,7 +41,7 @@ class YamlProcessor
   end
 
   def merge!(translation_key, translation)
-    @yaml_hash, translation_key, translation = Merger.merge_single_translation(@yaml_hash, translation_key, translation)
+    @yaml_hash, translation_key, translation = SlimKeyfy::Merger.merge_single_translation(@yaml_hash, translation_key, translation)
     [translation_key, translation]
   end
 
