@@ -1,6 +1,6 @@
 require 'yaml'
 
-class SlimKeyfy::YamlProcessor
+class SlimKeyfy::Slimutils::YamlProcessor
 
   attr_reader :locale, :yaml_output, :yaml_hash
 
@@ -20,14 +20,14 @@ class SlimKeyfy::YamlProcessor
     if File.exist?(path) then 
       path
     else
-      FileWriter.write(path, "---")
+      SlimKeyfy::Slimutils::FileWriter.write(path, "---")
       path
     end
   end
 
   def store!
     merged = {@locale => @yaml_hash}
-    FileWriter.write(@yaml_output, merged.to_yaml)
+    SlimKeyfy::Slimutils::FileWriter.write(@yaml_output, merged.to_yaml)
   end
 
   def load_hash
@@ -41,7 +41,7 @@ class SlimKeyfy::YamlProcessor
   end
 
   def merge!(translation_key, translation)
-    @yaml_hash, translation_key, translation = SlimKeyfy::Merger.merge_single_translation(@yaml_hash, translation_key, translation)
+    @yaml_hash, translation_key, translation = SlimKeyfy::Slimutils::Merger.merge_single_translation(@yaml_hash, translation_key, translation)
     [translation_key, translation]
   end
 

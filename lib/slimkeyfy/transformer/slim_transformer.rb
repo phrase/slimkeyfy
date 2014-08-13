@@ -33,7 +33,7 @@ class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTran
       simple_html
     else nil_elem end
 
-    return nil_elem if result.last.empty?
+    return nil_elem if (result.last.nil? or result.last.empty?)
 
     result
   end
