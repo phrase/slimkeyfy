@@ -12,7 +12,11 @@ class SlimKeyfy::Console::Printer
     elsif not diff.empty? then
       result =`diff #{bak_path} #{file_path}`
     end
-    puts "#{result}"
+    if result.nil? or result.strip.empty? then
+      puts "No changes to comparison found!"
+    else
+      puts "#{result}"
+    end
   end
   def self.normalize(line)
     line.sub(/^\s*/, " ")
