@@ -30,18 +30,18 @@ describe "SlimTransformer" do
         {"#{key_base}.hello_world" => "Hello World!"}]
       }
     end
-    context "with pipe ' slim symbol" do
+    context "with ' slim symbol" do
       let(:line){ "  ' Hello World!" }
       it {should == [
-        "  = t('.hello_world')", 
+        "  => t('.hello_world')", 
         {"#{key_base}.hello_world" => "Hello World!"}]
       }
     end
     context "with pipe and ampersand" do
       let(:line){ "  | &nbsp;Hello World!" }
       it {should == [
-        "  = t('.hello_world')", 
-        {"#{key_base}.hello_world" => " Hello World!"}]
+        "  =< t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
       }
     end
     context "with dotted html" do
@@ -52,6 +52,73 @@ describe "SlimTransformer" do
       }
     end
   end
+
+  describe "html/slim whitespacing rules" do
+    context "with leading and trailing nbsp; and |" do
+      let(:line){ "| &nbsp;Hello World!&nbsp;" }
+      it {should == [
+        "=<> t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
+
+    context "with leading nbsp; and |" do
+      let(:line){ "| &nbsp;Hello World!" }
+      it {should == [
+        "=< t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
+
+    context "with trailing nbsp; and |" do
+      let(:line){ "| Hello World!&nbsp;" }
+      it {should == [
+        "=> t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
+
+    context "with | and regular whitespace" do
+      let(:line){ "|  Hello World!" }
+      it {should == [
+        "= t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
+
+    context "with leading and trailing nbsp; and '" do
+      let(:line){ "' &nbsp;Hello World!&nbsp;" }
+      it {should == [
+        "=<> t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
+
+    context "with leading nbsp; and '" do
+      let(:line){ "' &nbsp;Hello World!" }
+      it {should == [
+        "=<> t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
+
+    context "with trailing nbsp; and '" do
+      let(:line){ "' Hello World!&nbsp;" }
+      it {should == [
+        "=> t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
+
+    context "with ' and regular whitespace" do
+      let(:line){ "'  Hello World!" }
+      it {should == [
+        "=> t('.hello_world')", 
+        {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
+  end
+
 
   describe "with translated tags" do
     context "with valid tag and nothing to translate" do

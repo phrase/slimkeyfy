@@ -13,7 +13,7 @@ class SlimKeyfy::Console::Printer
       result =`diff #{bak_path} #{file_path}`
     end
     if result.nil? or result.strip.empty? then
-      puts "No changes to comparison found!"
+      puts "No changes for comparison found!"
     else
       puts "#{result}"
     end

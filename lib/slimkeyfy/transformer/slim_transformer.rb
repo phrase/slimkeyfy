@@ -43,16 +43,15 @@ class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTran
   def parse_html
     return nil_elem if @word.line.match(TRANSLATED)
 
-    tagged_with_equals = to_equals_tag(@word.head)
-
+    tagged_with_equals = SlimKeyfy::Transformer::Whitespacer.convert_slim(@word.head)
     body = @word.tail.join(" ")
+    body, tagged_with_equals = SlimKeyfy::Transformer::Whitespacer.convert_nbsp(body, tagged_with_equals)
+
     if body.match(LINK_TO) != nil then
-      translation = link_tos(body)
-    else
-      translation = convert_html_whitespace(match_string(body))
+      body = link_tos(body)
     end
     
-    translation_key = update_hashes(translation)
+    translation_key = update_hashes(body)
     normalize_translation("#{tagged_with_equals} #{translation_key}")
   end
 
@@ -67,14 +66,6 @@ class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTran
     end
     normalize_translation(line)
   end
-  
-  def to_equals_tag(s)
-    s = s.gsub(/[\|']/, "=")
-    m = s.match(HTML_TAGS)
-    return s if m.nil? or m[:html_tag].nil?
-    return s if has_equals_tag(s, m[:html_tag])
-    s.gsub(m[:html_tag], "#{m[:html_tag]}=")
-  end
 
   def link_tos(line)
     m = line.match(LINK_TO)
@@ -86,14 +77,6 @@ class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTran
     else
       line
     end
-  end
-
-  def has_equals_tag(s, html_tag)
-    s.gsub(html_tag, "").strip.start_with?("=")
-  end
-
-  def convert_html_whitespace(s)
-    s.gsub("&nbsp;", " ")
   end
 
   def normalize_translation(translation)
