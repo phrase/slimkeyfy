@@ -150,7 +150,6 @@ Todo
 - adding / generalizing Regular Expressions for better hit rate
 - a dry run option where you can see what will happen if you convert.
 - Options/flags (no_backup_creation, dry_run) 
-- whitespace handling is currently very simple (fills translations with whitespaces)
 
 Issues
 -
