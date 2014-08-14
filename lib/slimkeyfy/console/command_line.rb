@@ -32,10 +32,16 @@ class SlimKeyfy::Console::Commandline
       puts "Slimkeyfy 0.0.6 (beta)"
       exit
     end
-    opts.on_tail('-r', '--recursive', 'If a directory is given all subdirectories will be walked either. 
+    opts.on_tail('-R', '--recursive', 'If a directory is given all subdirectories will be walked either. 
                                       Without -r and a directory just the files within the first level are walked.
                                       ') do
       @options[:recursive] = true
+    end
+    opts.on_tail('-b', '--no-backup', 'No Backups - for safety reasons - are created. For minimum safety we 
+                                      recommend a version control like git. Backups will still be created for 
+                                      comparison but deleted right after you agree to the changes.
+                                ') do
+      @options[:no_backup] = true
     end
   end
 
@@ -58,7 +64,7 @@ class SlimKeyfy::Console::Commandline
 
   def directory_translate(input)
     rec = @options.fetch(:recursive, false)
-    file_util.walk(input, rec).each do |rec_input|
+    SlimKeyfy::Slimutils::MFileUtils.walk(input, rec).each do |rec_input|
       if File.file?(rec_input) and is_valid_ext?(rec_input) then
         @options[:input] = rec_input
         translate
@@ -71,7 +77,7 @@ class SlimKeyfy::Console::Commandline
   end
 
   def translate
-    @options[:ext] = ext = file_util.file_extension(@options[:input])
+    @options[:ext] = ext = SlimKeyfy::Slimutils::MFileUtils.file_extension(@options[:input])
     unless is_valid_ext?(ext) then
       puts "invalid Input with extension #{ext}"
       return
@@ -82,11 +88,7 @@ class SlimKeyfy::Console::Commandline
     begin
       translate_slim.stream_mode
     rescue Interrupt
-      file_util.restore(translate_slim.bak_path, translate_slim.original_file_path)
+      SlimKeyfy::Slimutils::MFileUtils.restore(translate_slim.bak_path, translate_slim.original_file_path)
     end
-  end
-
-  def file_util
-    SlimKeyfy::Slimutils::MFileUtils
   end
 end

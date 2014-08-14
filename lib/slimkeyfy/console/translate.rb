@@ -6,6 +6,7 @@ class SlimKeyfy::Console::Translate
     @extension = options[:ext]
     @transformer = transformer
     @original_file_path = options[:input]
+    @no_backup = options.fetch(:no_backup, false)
     @bak_path = SlimKeyfy::Slimutils::MFileUtils.backup(@original_file_path)
     @content = SlimKeyfy::Slimutils::FileReader.read(@bak_path).split("\n")
     @file_path = SlimKeyfy::Slimutils::MFileUtils.create_new_file(@original_file_path)
@@ -75,6 +76,7 @@ class SlimKeyfy::Console::Translate
       if SlimKeyfy::Console::IOAction.yes_or_no?("Do you like to save your changes?") then
         @yaml_processor.store!
         puts "Saved! at #{@original_file_path}"
+        SlimKeyfy::Slimutils::MFileUtils.rm(@bak_path) if @no_backup
       else
         SlimKeyfy::Slimutils::MFileUtils.restore(@bak_path, @original_file_path)
         puts "Restored!"
