@@ -251,5 +251,26 @@ describe "SlimTransformer" do
       let(:translated) { "= link_to image_tag(\"application/logo.png\", alt: t('.phraseapp'), height: 21, width: 106), root_path, class: \"navbar-brand\"" }
       it { should == [ translated , {"key_base.new.phraseapp" => "PhraseApp"}]}
     end
+
+    context "when line contains a include_blank tag" do
+      let( :line ) { "= f.input :currency, collection: available_currencies, required: false, include_blank: \"Aha, I delete selected\", selected: @billing_currency, hint: t('.please_select_the_currency')" }
+      let(:translated) { "= f.input :currency, collection: available_currencies, required: false, include_blank: t('.aha_i_delete_selected'), selected: @billing_currency, hint: t('.please_select_the_currency')" }
+      it { should == [ translated , {"key_base.new.aha_i_delete_selected" => "Aha, I delete selected"}]}
+    end
+
+    context "when line contains a data tag followed by confirm tag" do
+      let( :line ) { "= button_tag t('.delete_selected'), data: {confirm: \"Do you really want to delete this?\"}, class: \"btn btn-danger btn-sm\"" }
+      let(:translated) { "= button_tag t('.delete_selected'), data: {confirm: t('.do_you_really_want')}, class: \"btn btn-danger btn-sm\"" }
+      it { should == [ translated , {"key_base.new.do_you_really_want" => "Do you really want to delete this?"}]}
+    end
+
+    context "when line contains a data tag followed by content tag" do
+      let( :line ) { "- key_stuff = \"#\{raw(t('.key_names', href: \"#\{link_to(\"W00t\", title: t('.key_names_column'), data: {content: \"Some more Content\", html: true})}\"" }
+      let(:translated) { "- key_stuff = \"#\{raw(t('.key_names', href: \"#\{link_to(t('.w00t'), title: t('.key_names_column'), data: {content: t('.some_more_content'), html: true})}\"" }
+      it { should == [ translated , 
+        {"key_base.new.w00t" => "W00t",
+         "key_base.new.some_more_content" => "Some more Content"}]
+        }
+    end
   end
 end
