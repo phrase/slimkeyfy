@@ -236,5 +236,20 @@ describe "SlimTransformer" do
          "key_base.new.separate_multiple_email_addresses" => "Separate multiple email addresses by comma"}]
         }
     end
+
+    context "when line contains a button with symbolic reference" do
+      let( :line ) { " = f.button :submit, \"Add Language\", class: \"btn btn-primary\", title: \"A Title\"" }
+      let(:translated) { " = f.button :submit, t('.add_language'), class: \"btn btn-primary\", title: t('.a_title')" }
+      it { should == [ translated , 
+        {"key_base.new.a_title" => "A Title",
+         "key_base.new.add_language" => "Add Language"}]
+        }
+    end
+
+    context "when line contains a alt tag" do
+      let( :line ) { "= link_to image_tag(\"application/logo.png\", alt: \"PhraseApp\", height: 21, width: 106), root_path, class: \"navbar-brand\"" }
+      let(:translated) { "= link_to image_tag(\"application/logo.png\", alt: t('.phraseapp'), height: 21, width: 106), root_path, class: \"navbar-brand\"" }
+      it { should == [ translated , {"key_base.new.phraseapp" => "PhraseApp"}]}
+    end
   end
 end

@@ -3,19 +3,20 @@ class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTran
   HTML_TAGS = /^(?<html_tag>'|\||([a-z\.]+[0-9\-]*)+)/
   EQUALS = /(([a-z\.]+[0-9\-]*)*=.*)/
 
-  BEFORE = /(?<before>.*)/
-  TRANSLATION = /(?<translation>(".*?"|'.*?'))/
-  AFTER = /(?<after>,?.*)?/
+  BEFORE =        /(?<before>.*)/
+  TRANSLATION =   /(?<translation>(".*?"|'.*?'))/
+  AFTER =         /(?<after>,?.*)?/
 
   HTML_ARGUMENTS = {
-    hint: /(?<html_tag>hint:\s*)/,
-    link_to: /(?<html_tag>link_to\s*\(?)/,
-    inconified: /(?<html_tag>(iconified\s*\(?))/,
-    placeholder: /(?<html_tag>placeholder:\s*)/,
-    title: /(?<html_tag>title:\s*)/,
-    label: /(?<html_tag>[a-z]*_?label:\s*)/,
-    input_button: /(?<html_tag>[a-z]*\.?(button|input):?\s*)/,
-    tag: /(?<html_tag>(submit|content)_tag[\:\(]?\s*)/
+    hint:         /(?<html_tag>hint:\s*)/,
+    link_to:      /(?<html_tag>link_to\s*\(?)/,
+    inconified:   /(?<html_tag>(iconified\s*\(?))/,
+    placeholder:  /(?<html_tag>placeholder:\s*)/,
+    title:        /(?<html_tag>title:\s*)/,
+    label_alt:    /(?<html_tag>[a-z]*_?(label|alt):\s*)/,
+    input:        /(?<html_tag>[a-z]*\.?input:?\s*)/,
+    button:       /(?<html_tag>[a-z]*\.?button:?\s*(\:[a-z]+\s*,\s*)?)/,
+    tag:          /(?<html_tag>(submit|content)_tag[\:\(]?\s*)/
   }
 
   LINK_TO = /#{HTML_ARGUMENTS[:link_to]}#{TRANSLATION}/
