@@ -4,8 +4,8 @@ class SlimKeyfy::Slimutils::BaseKeyGenerator
       when "slim" then 
         [subdir_name(file_path), filename(file_path)].join(".") 
       when "rb" then 
-        sub = subdir_name(file_path, ["controllers"])
-        fname = filename(file_path, ".rb")
+        sub = subdir_name(file_path, "controllers")
+        fname = filename(file_path)
         if sub != nil and !sub.strip.empty? then
           "#{sub}.#{fname}"
         else
@@ -14,15 +14,21 @@ class SlimKeyfy::Slimutils::BaseKeyGenerator
       else nil end
     key_name
   end
-  def self.filename(file_path, file_extension=".html.slim")
+  def self.filename(file_path)
     return "" if file_path.nil?
-    fname = File.basename(file_path, file_extension)
+    if file_path.end_with?(".html.slim") then
+      fname = File.basename(file_path, ".html.slim")
+    elsif file_path.end_with?(".slim") then
+      fname = File.basename(file_path, ".slim")
+    elsif file_path.end_with?(".rb") then
+      fname = File.basename(file_path, ".rb")
+    else return "" end
     fname = fname[1..-1] if fname.start_with?("_")
     fname
   end
-  def self.subdir_name(file_path, delim=["views"])
+  def self.subdir_name(file_path, delim="views")
     return "" if file_path.nil?
-    dirs = file_path.split("/").drop_while{|e| delim.all?{|d| e != d }}
+    dirs = file_path.split("/").drop_while{|e| e != delim }
     return "" if dirs.empty?
     strip_dirs_and_file = dirs.pop(dirs.size-1)
     strip_dirs_and_file[0..-2].join(".")

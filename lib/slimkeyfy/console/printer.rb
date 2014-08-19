@@ -21,9 +21,9 @@ class SlimKeyfy::Console::Printer
   def self.normalize(line)
     line.sub(/^\s*/, " ")
   end
-  def self.tag(old_line, translations)
+  def self.tag(old_line, translations, comment_tag)
     prettified_translations = translations.map{|k, v| "#{k}: #{v}, t('.#{k.split(".").last}')" }.join(" | ")
-    "#{indentation(old_line)}// #{prettified_translations}\n#{old_line}"
+    "#{indentation(old_line)}#{comment_tag} #{prettified_translations}\n#{old_line}"
   end
   def self.indentation(line)
     return "" if line.nil? or line.empty?

@@ -19,15 +19,26 @@ describe "BaseKeyGenerator" do
     end
     context "subdir name" do
       let( :file_path ) { "app/views/application/sidebar/_show.html.slim"}
-      subject { base_generator.subdir_name(file_path, ["views"]) }
+      subject { base_generator.subdir_name(file_path, "views") }
       it { should == "application.sidebar" }
     end
-    context "filename" do
+    context "filename with .html.slim" do
       let( :file_path ) { "app/views/application/sidebar/_show.html.slim"}
       subject { base_generator.filename(file_path) }
       it { should == "show" }
     end
+    context "filename with .slim" do
+      let( :file_path ) { "app/views/application/sidebar/_show.slim"}
+      subject { base_generator.filename(file_path) }
+      it { should == "show" }
+    end
+    context "filename with invalid file" do
+      let( :file_path ) { "app/views/application/sidebar/_show.html.haml"}
+      subject { base_generator.filename(file_path) }
+      it { should == "" }
+    end
   end
+
   describe "rb"  do
     let( :extension ) { "rb" }
     context "without nested structure" do
@@ -42,12 +53,12 @@ describe "BaseKeyGenerator" do
     end
     context "subdir name" do
       let( :file_path ) { "app/controllers/some_dir/some_controller.rb"}
-      subject { base_generator.subdir_name(file_path, ["controllers", "models"]) }
+      subject { base_generator.subdir_name(file_path, "controllers") }
       it { should == "some_dir" }
     end
     context "filename" do
       let( :file_path ) { "app/controllers/some_dir/some_controller.rb"}
-      subject { base_generator.filename(file_path, ".rb") }
+      subject { base_generator.filename(file_path) }
       it { should == "some_controller" }
     end
   end

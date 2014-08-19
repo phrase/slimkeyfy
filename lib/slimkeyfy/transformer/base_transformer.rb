@@ -31,4 +31,12 @@ class SlimKeyfy::Transformer::BaseTransformer
   def update_hashes(translation)
     @word.update_translation_key_hash(@yaml_processor, translation)
   end
+
+  def controller?
+    false
+  end
+
+  def slim?
+    false
+  end
 end

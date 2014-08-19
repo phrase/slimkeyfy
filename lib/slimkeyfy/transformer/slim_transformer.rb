@@ -82,4 +82,8 @@ class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTran
   def normalize_translation(translation)
     ["#{@word.indentation}#{translation}", @word.translations]
   end
+
+  def slim?
+    true
+  end
 end

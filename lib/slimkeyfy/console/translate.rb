@@ -59,7 +59,7 @@ class SlimKeyfy::Console::Translate
         update_with(idx, old_line)
         @yaml_processor.delete_translations(translations)
       when "x" then 
-        update_with(idx, SlimKeyfy::Console::Printer.tag(old_line, translations))
+        update_with(idx, SlimKeyfy::Console::Printer.tag(old_line, translations, comment_tag))
         @yaml_processor.delete_translations(translations)
       when "a" then
         SlimKeyfy::Slimutils::MFileUtils.restore(@bak_path, @original_file_path)
@@ -93,5 +93,9 @@ class SlimKeyfy::Console::Translate
 
   def translations_are_invalid?(translations)
     translations.nil? or translations.empty?
+  end
+
+  def comment_tag
+    @transformer.slim? ? "//" : "#"
   end
 end

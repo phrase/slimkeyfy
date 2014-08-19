@@ -71,17 +71,13 @@ class SlimKeyfy::Console::Commandline
       end
     end
   end
-  
-  def is_valid_ext?(ext)
-    (ext.end_with?("slim") or ext.end_with?("rb"))
-  end
 
   def translate
-    @options[:ext] = ext = SlimKeyfy::Slimutils::MFileUtils.file_extension(@options[:input])
-    unless is_valid_ext?(ext) then
-      puts "invalid Input with extension #{ext}"
+    unless SlimKeyfy::Slimutils::MFileUtils.is_valid_extension?(@options[:input]) then
+      puts "invalid extension!"
       return
     end
+    @options[:ext] = SlimKeyfy::Slimutils::MFileUtils.file_extension(@options[:input])
 
     puts "file=#{@options[:input]}"
     translate_slim = SlimKeyfy::Console::Translate.new(@options)

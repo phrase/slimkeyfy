@@ -13,4 +13,8 @@ class SlimKeyfy::Transformer::ControllerTransformer < SlimKeyfy::Transformer::Ba
     end
     nil_elem
   end
+
+  def controller?
+    true
+  end
 end
