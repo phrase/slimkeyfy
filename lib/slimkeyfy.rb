@@ -2,9 +2,9 @@
 module SlimKeyfy
   
   def self.translate(args)
-    SlimKeyfy::Console::Commandline.new(args).main
+    SlimKeyfy::Console::Commandline.new(args).run
   end
-
+  
 end
 
 require 'slimkeyfy/slimutils'

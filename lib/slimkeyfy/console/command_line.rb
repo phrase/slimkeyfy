@@ -29,7 +29,7 @@ class SlimKeyfy::Console::Commandline
       exit
     end
     opts.on_tail('-v', '--version', 'Show current version') do
-      puts "Slimkeyfy 0.0.6 (beta)"
+      puts "0.1"
       exit
     end
     opts.on_tail('-R', '--recursive', 'If a directory is given all subdirectories will be walked either. 
@@ -45,7 +45,7 @@ class SlimKeyfy::Console::Commandline
     end
   end
 
-  def main
+  def run
     @options[:input] = input = @args.shift
     @options[:locale] = locale = @args.shift
     @options[:yaml_output] = @args.shift

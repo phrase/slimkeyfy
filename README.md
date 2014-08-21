@@ -16,12 +16,20 @@ h1= t('.hello_world')
 
 Install
 -
-```unix
-git clone https://github.com/phrase/slimkeyfy.git 
-cd slimkeyfy
-gem build slimkeyfy.gemspec
-gem install slimkeyfy-0.0.6.gem
-# Later: gem install slimkeyfy
+
+With Ruby Gems
+```ruby
+> gem install slimkeyfy
+```
+
+With Bundler
+```ruby
+group :development do
+  # Github
+  gem 'slimkeyfy', github: 'https://github.com/phrase/slimkeyfy.git'
+  # or with concrete version
+  gem 'slimkeyfy', '~> 0.1'
+end
 ```
 
 Approach
@@ -37,7 +45,7 @@ slimkeyfy INPUT_FILENAME_OR_DIRECTORY LOCALE (e.g. en, fr) [YAML_FILE] [Options]
 - If you provide one make sure that the top level locale matches your provided locale
 - The YAML file will be loaded as a hash and deep_merged with the new found translations
 
-**Stream** - walks through the given file/files and if a regex hits you will be prompted to apply (y)es, discard (n)o, tag (x) (like a git conflict with information) or (a)bort (only aborts the current file).
+**Stream** - walks through the given file/files and if a regex hits you will be prompted to apply (y)es, discard (n)o, tag (x) (comments suggestions above the processed line) or (a)bort (only aborts the current file).
 
 without YAML file
 ```unix
@@ -47,7 +55,8 @@ with given YAML file (has to be valid YAML! with the top level locale matching y
 ```unix
 slimkeyfy path/to/your/dir/ en path/to/your/en.yml
 ```
-A Backup (.bak) of the old file will be created e.g. index.html.slim => index.html.slim.bak
+A Backup (.bak) of the old file will be created e.g. index.html.slim => index.html.slim.bak.
+Providing ---no-backup creates the backups temporarily and deletes them right after you apply your changes. (be careful!)
 
 Example Usage
 -
