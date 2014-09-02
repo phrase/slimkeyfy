@@ -17,8 +17,8 @@ class SlimKeyfy::Console::Commandline
 #{"Usage".white}: slimkeyfy #{"INPUT_FILENAME_OR_DIRECTORY".green} #{"LOCALE".red} #{"[YAML_FILE]".yellow} [Options]
   e.g. slimkeyfy #{"app/views/users/".green} #{"en".red} #{"phrase/locales/en.yml".yellow} [Options]
 
-#{"Description".white}: Extract plain Strings from .slim views and Rails controllers to 
-  replace them with I18n's t() method. Keys with it's translations will be streamed 
+#{"Description".white}: Extract plain Strings from .slim views and Rails controllers to
+  replace them with I18n's t() method. Keys with it's translations will be streamed
   to a YAML file.
 
   the following options are available:
@@ -32,13 +32,13 @@ class SlimKeyfy::Console::Commandline
       puts "0.1"
       exit
     end
-    opts.on_tail('-R', '--recursive', 'If a directory is given all subdirectories will be walked either. 
+    opts.on_tail('-R', '--recursive', 'If a directory is given all subdirectories will be walked either.
                                       Without -r and a directory just the files within the first level are walked.
                                       ') do
       @options[:recursive] = true
     end
-    opts.on_tail('-b', '--no-backup', 'No Backups - for safety reasons - are created. For minimum safety we 
-                                      recommend a version control like git. Backups will still be created for 
+    opts.on_tail('-b', '--no-backup', 'No Backups - for safety reasons - are created. For minimum safety we
+                                      recommend a version control like git. Backups will still be created for
                                       comparison but deleted right after you agree to the changes.
                                 ') do
       @options[:no_backup] = true
@@ -65,7 +65,7 @@ class SlimKeyfy::Console::Commandline
   def directory_translate(input)
     rec = @options.fetch(:recursive, false)
     SlimKeyfy::Slimutils::MFileUtils.walk(input, rec).each do |rec_input|
-      if File.file?(rec_input) and is_valid_ext?(rec_input) then
+      if File.file?(rec_input) and SlimKeyfy::Slimutils::MFileUtils.is_valid_extension?(rec_input) then
         @options[:input] = rec_input
         translate
       end
