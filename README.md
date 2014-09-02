@@ -1,14 +1,17 @@
 Slimkeyfy
 =
 Extract plain Strings from .slim views and Rails controllers to replace them with I18n's t() method. Keys with it's translations will be streamed to a YAML file.
+
+Read more in this blog post: [PhraseApp Blog: Make your Rails App localizable with Slimkeyfy](http://blog.phraseapp.com/post/96450272307/make-your-rails-app-localizable-with-slimkeyfy)
+
 ```ruby
 slimkeyfy app/views/users/show.html.slim en
 # users/show.html.slim
 h1 Hello World!
 # converts to
-h1= t('.hello_world') 
+h1= t('.hello_world')
 # config/locales/users.en.yaml
-# en: 
+# en:
 #   user:
 #     show:
 #       hello_world: Hello World!
@@ -79,7 +82,7 @@ your_app_name/
 
 > pwd
 ../your_app_name/
- 
+
 > slimkeyfy app/views/users/ en
 ... choose your changes here (y/n/x/a)
 
@@ -88,22 +91,22 @@ your_app_name/
     show.html.slim
     new.html.slim.bak
     show.html.slim.bak
-    
+
 > ls config/locales/
     user.en.yml
     en.yml
-    
+
 > cat ../users/new.html.slim.bak
   h1 Hello World!
-    
+
 > cat ../users/new.html.slim
   h1= t('.hello_world')
- 
+
 > cat config/locales/en.yml
   --
   en:
     keys..
-          
+
 > cat config/locales/users.en.yml
   ---
   en:
@@ -117,13 +120,13 @@ Suggested Workflow
 -
 As HTML is not 100% parsable there will be errors in the conversion. To minimize your error rate we suggest to approach each view or view_folder individually. The i18n-tasks gem helped a lot by finding errors. Always double check your views and make sure that everything went smoothly. Especially double check all your links. Here is an example workflow:
 ```ruby
-# 1. create a branch for a view folder 
+# 1. create a branch for a view folder
 > git checkout -b users_localization
 
 # 2. slimkeyfy the view folder you would like to tag
 > slimkeyfy app/views/users/ en
 
-# 3. go through all files and verify/add missing translations 
+# 3. go through all files and verify/add missing translations
 # (check against the .bak files (use git diff))
 > git diff app/views/users/views.html.slim
 
