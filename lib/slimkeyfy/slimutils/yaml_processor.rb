@@ -12,12 +12,12 @@ class SlimKeyfy::Slimutils::YamlProcessor
   end
 
   def process_output_file(yaml_output)
-    if yaml_output.nil? then
+    if yaml_output.nil?
       dir_of_key = @key_base.split(".").first
       yaml_output = default_yaml(dir_of_key, @locale)
     end
     path = File.expand_path(yaml_output.to_s)
-    if File.exist?(path) then 
+    if File.exist?(path) 
       path
     else
       SlimKeyfy::Slimutils::FileWriter.write(path, "---")
@@ -32,8 +32,11 @@ class SlimKeyfy::Slimutils::YamlProcessor
 
   def load_hash
     h = YAML::load_file(@yaml_output)
-    if h then h[@locale]
-    else {} end
+    if h
+      h[@locale]
+    else 
+      {} 
+    end
   end
 
   def default_yaml(key, locale)

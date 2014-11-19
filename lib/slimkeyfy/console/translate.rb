@@ -17,9 +17,9 @@ class SlimKeyfy::Console::Translate
   end
 
   def transformer
-    if @extension == "slim" then
+    if @extension == "slim"
       SlimKeyfy::Transformer::SlimTransformer
-    elsif @extension == "rb" then
+    elsif @extension == "rb"
       SlimKeyfy::Transformer::ControllerTransformer
     else
       puts "Unknown extension type!"
@@ -69,11 +69,11 @@ class SlimKeyfy::Console::Translate
   end
 
   def finalize!
-    if @changes then
-      if SlimKeyfy::Console::IOAction.yes_or_no?("Do you like to review your changes?") then
+    if @changes
+      if SlimKeyfy::Console::IOAction.yes_or_no?("Do you like to review your changes?")
         SlimKeyfy::Console::Printer.unix_diff(@bak_path, @original_file_path)
       end
-      if SlimKeyfy::Console::IOAction.yes_or_no?("Do you like to save your changes?") then
+      if SlimKeyfy::Console::IOAction.yes_or_no?("Do you like to save your changes?")
         @yaml_processor.store!
         puts "Saved! at #{@original_file_path}"
         SlimKeyfy::Slimutils::MFileUtils.rm(@bak_path) if @no_backup

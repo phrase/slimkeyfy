@@ -272,5 +272,14 @@ describe "SlimTransformer" do
          "key_base.new.some_more_content" => "Some more Content"}]
         }
     end
+    
+    context "when line contains a #" do
+      let( :line ) { "# key_stuff = \"#\{raw(t('.key_names', href: \"#\{link_to(\"W00t\", title: t('.key_names_column'), data: {content: \"Some more Content\", html: true})}\"" }
+      let(:translated) { "# key_stuff = \"#\{raw(t('.key_names', href: \"#\{link_to(t('.w00t'), title: t('.key_names_column'), data: {content: t('.some_more_content'), html: true})}\"" }
+      it { should == [ translated , 
+        {"key_base.new.w00t" => "W00t",
+         "key_base.new.some_more_content" => "Some more Content"}]
+        }
+    end
   end
 end
