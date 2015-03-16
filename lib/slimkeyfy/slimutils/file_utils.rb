@@ -39,9 +39,8 @@ class SlimKeyfy::Slimutils::MFileUtils
     file_path.split(".").last
   end
   def self.is_valid_extension?(file_path)
-    ext = self.file_extension(file_path)
-    return false if (ext.nil? or ext.empty?)
-    (ext.end_with?("slim") or ext.end_with?("rb"))
+    return false if (file_path.nil? or file_path.empty?)
+    (file_path.end_with?(".slim") or file_path.end_with?(".rb"))
   end
 end
 

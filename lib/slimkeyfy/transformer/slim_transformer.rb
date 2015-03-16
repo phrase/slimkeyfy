@@ -1,7 +1,7 @@
 class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTransformer
 
   HTML_TAGS = /^(?<html_tag>'|\||([a-z\.]+[0-9\-]*)+)/
-  EQUALS = /(([a-z\.]+[0-9\-]*)*=.*)/
+  EQUALS = /#?([a-z0-9\.\-\s]+)?\=.*/
 
   BEFORE =        /(?<before>.*)/
   TRANSLATION =   /(?<translation>(".*?"|'.*?'))/
@@ -32,9 +32,9 @@ class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTran
     unindented_line = @word.unindented_line
 
     result = 
-    if unindented_line.match(EQUALS) then
+    if unindented_line.match(EQUALS)
       parse_html_arguments(unindented_line)
-    elsif @word.head.match(HTML_TAGS) then
+    elsif @word.head.match(HTML_TAGS)
       parse_html
     else nil_elem end
 
@@ -50,7 +50,7 @@ class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTran
     body = @word.tail.join(" ")
     body, tagged_with_equals = SlimKeyfy::Transformer::Whitespacer.convert_nbsp(body, tagged_with_equals)
 
-    if body.match(LINK_TO) != nil then
+    if body.match(LINK_TO) != nil
       body = link_tos(body)
     end
     
@@ -72,7 +72,7 @@ class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTran
 
   def link_tos(line)
     m = line.match(LINK_TO)
-    if m != nil then
+    if m != nil
       _, translation = m[:html_tag], match_string(m[:translation])
       translation_key = update_hashes(translation)
       line = line.gsub(m[:translation], translation_key)

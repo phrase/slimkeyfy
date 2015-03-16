@@ -52,9 +52,9 @@ class SlimKeyfy::Console::Commandline
 
     wrong_usage if (input.nil? or locale.nil?)
 
-    if File.directory?(input) then
+    if File.directory?(input)
       directory_translate(input)
-    elsif File.file?(input) then
+    elsif File.file?(input)
       translate
     else
       raise "Please provide a file or directory!"
@@ -65,7 +65,7 @@ class SlimKeyfy::Console::Commandline
   def directory_translate(input)
     rec = @options.fetch(:recursive, false)
     SlimKeyfy::Slimutils::MFileUtils.walk(input, rec).each do |rec_input|
-      if File.file?(rec_input) and SlimKeyfy::Slimutils::MFileUtils.is_valid_extension?(rec_input) then
+      if File.file?(rec_input) and SlimKeyfy::Slimutils::MFileUtils.is_valid_extension?(rec_input)
         @options[:input] = rec_input
         translate
       end
@@ -73,7 +73,7 @@ class SlimKeyfy::Console::Commandline
   end
 
   def translate
-    unless SlimKeyfy::Slimutils::MFileUtils.is_valid_extension?(@options[:input]) then
+    unless SlimKeyfy::Slimutils::MFileUtils.is_valid_extension?(@options[:input])
       puts "invalid extension!"
       return
     end

@@ -7,12 +7,12 @@ class SlimKeyfy::Console::Printer
   def self.unix_diff(bak_path, file_path)
     result = "Please install colordiff or diff (brew install colordiff)"
     colordiff, diff = `which colordiff`, `which diff`
-    if not colordiff.empty? then
+    if not colordiff.empty?
       result = `colordiff #{bak_path} #{file_path}`
-    elsif not diff.empty? then
+    elsif not diff.empty?
       result =`diff #{bak_path} #{file_path}`
     end
-    if result.nil? or result.strip.empty? then
+    if result.nil? or result.strip.empty?
       puts "No changes for comparison found!"
     else
       puts "#{result}"

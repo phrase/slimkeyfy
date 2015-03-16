@@ -27,7 +27,7 @@ class SlimKeyfy::Transformer::Word
   end
 
   def i18nString(translation_key)
-    if @extension == "rb" then
+    if @extension == "rb"
       "t('#{@key_base}.#{translation_key}')"
     else
       "t('.#{translation_key}')"
