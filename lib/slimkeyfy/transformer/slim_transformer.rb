@@ -1,7 +1,7 @@
 class SlimKeyfy::Transformer::SlimTransformer < SlimKeyfy::Transformer::BaseTransformer
 
   HTML_TAGS = /^(?<html_tag>'|\||([a-z\.]+[0-9\-]*)+)/
-  EQUALS = /(([a-z\.]+[0-9\-]*)*=.*)/
+  EQUALS = /#?([a-z0-9\.\-\s]+)?\=.*/
 
   BEFORE =        /(?<before>.*)/
   TRANSLATION =   /(?<translation>(".*?"|'.*?'))/
