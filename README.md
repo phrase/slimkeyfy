@@ -31,7 +31,7 @@ group :development do
   # Github
   gem 'slimkeyfy', github: 'https://github.com/phrase/slimkeyfy.git'
   # or with concrete version
-  gem 'slimkeyfy', '~> 0.1'
+  gem 'slimkeyfy', '~> 0.0.3'
 end
 ```
 
