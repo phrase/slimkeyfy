@@ -28,7 +28,7 @@ class SlimKeyfy::Transformer::Word
 
   def i18nString(translation_key, args={})
     args_string = args.inject('') do |string, (k,v)|
-      string += ", #{k}: #{v}"
+      string += ", #{k}: (#{v})"
     end
     
     if @extension == "rb"

@@ -160,7 +160,7 @@ describe "SlimTransformer" do
 
     context "when word contains link_to" do
       let( :line ) { 'p Not sure yet? Learn more and #{link_to("browse our features", features_path)} or #{link_to("Try our demo", demo_path)}.' }
-      let(:translated) { 'p= t(\'.not_sure_yet_learn\', link_to: link_to(t(\'.browse_our_features\'), features_path), link_to1: link_to(t(\'.try_our_demo\'), demo_path))' }
+      let(:translated) { 'p= t(\'.not_sure_yet_learn\', link_to: (link_to(t(\'.browse_our_features\'), features_path)), link_to1: (link_to(t(\'.try_our_demo\'), demo_path)))' }
       let(:result_hash) {{"key_base.new.browse_our_features" => "browse our features", "key_base.new.try_our_demo" => "Try our demo", "key_base.new.not_sure_yet_learn" => 'Not sure yet? Learn more and %{link_to} or %{link_to1}.'}}
       it { should == [ translated , result_hash] }
     end
