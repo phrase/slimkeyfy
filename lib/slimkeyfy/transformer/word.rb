@@ -39,10 +39,10 @@ class SlimKeyfy::Transformer::Word
   end
 
   def update_translation_key_hash(yaml_processor, translation)
+    arguments, translation = extract_arguments(translation)
     translation_key = SlimKeyfy::Slimutils::TranslationKeyGenerator.new(translation).generate_key_name
     translation_key_with_base = "#{@key_base}.#{translation_key}"
     translation_key_with_base, translation = yaml_processor.merge!(translation_key_with_base, translation) unless yaml_processor.nil?
-    arguments, translation = extract_arguments(translation)
     @translations.merge!({translation_key_with_base => translation})
     i18nString(extract_updated_key(translation_key_with_base), arguments)
   end
