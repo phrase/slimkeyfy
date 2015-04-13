@@ -8,13 +8,13 @@ describe "Word" do
   let( :translation_key ) { "hello_world" }
 
   context "with slim extension the key should be relative" do
-    subject { word.i18nString(translation_key) }
+    subject { word.i18n_string(translation_key) }
     it { should == "t('.hello_world')" }
   end
 
   context "with rb extension the key should be absolute" do
     let( :extension ) { "rb" }
-    subject { word.i18nString(translation_key) }
+    subject { word.i18n_string(translation_key) }
     it { should == "t('key_base.new.hello_world')" }
   end
 

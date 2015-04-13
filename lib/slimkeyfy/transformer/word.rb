@@ -26,7 +26,7 @@ class SlimKeyfy::Transformer::Word
     as_list.drop(1)
   end
 
-  def i18nString(translation_key, args={})
+  def i18n_string(translation_key, args={})
     args_string = args.inject('') do |string, (k,v)|
       string += ", #{k}: (#{v})"
     end
@@ -44,7 +44,7 @@ class SlimKeyfy::Transformer::Word
     translation_key_with_base = "#{@key_base}.#{translation_key}"
     translation_key_with_base, translation = yaml_processor.merge!(translation_key_with_base, translation) unless yaml_processor.nil?
     @translations.merge!({translation_key_with_base => translation})
-    i18nString(extract_updated_key(translation_key_with_base), arguments)
+    i18n_string(extract_updated_key(translation_key_with_base), arguments)
   end
   
   def extract_arguments(translation)
@@ -56,7 +56,7 @@ class SlimKeyfy::Transformer::Word
       translation = translation.gsub(arg, "%{#{key}}")
       args[key]= stripped_arg
     end
-    return [args, translation]
+    [args, translation]
   end
 
   def extract_updated_key(translation_key_with_base)
