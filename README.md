@@ -162,8 +162,8 @@ Todo
 - adding / generalizing Regular Expressions for better hit rate
 
 Closed Todos
-  -
-  - YAML placeholders are supported - thx@joshblour
+-
+- YAML placeholders are supported - thx@joshblour
 
 Issues
 -
