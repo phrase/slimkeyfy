@@ -157,10 +157,13 @@ If you are already familiar with the PhraseApp gem you can upload your translati
 
 Todo
 -
-- YAML placeholders are currently not supported (We are working on it!).
 - a dry run option where you can see what will happen if you convert.
 - currently you are prompted for all hits - We would like to do 70-80% automatically and prompt for the 20-30% that cannot be decided upon.
 - adding / generalizing Regular Expressions for better hit rate
+
+Closed Todos
+  -
+  - YAML placeholders are supported - thx@joshblour
 
 Issues
 -
