@@ -2,7 +2,7 @@ Slimkeyfy
 =
 Extract plain Strings from .slim views and Rails controllers to replace them with I18n's t() method. Keys with it's translations will be streamed to a YAML file.
 
-Read more in this blog post: [PhraseApp Blog: Make your Rails App localizable with Slimkeyfy](http://blog.phraseapp.com/post/96450272307/make-your-rails-app-localizable-with-slimkeyfy)
+Read more in this blog post: [PhraseApp Blog: Make your Rails App localizable with Slimkeyfy](https://phraseapp.com/blog/posts/slim-localize-your-slim-templates-in-a-second-with-slimkeyfy/)
 
 ```ruby
 slimkeyfy app/views/users/show.html.slim en
