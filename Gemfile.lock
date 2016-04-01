@@ -1,7 +1,27 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    coderay (1.1.1)
     diff-lcs (1.2.5)
+    httparty (0.13.5)
+      json (~> 1.8)
+      multi_xml (>= 0.5.2)
+    json (1.8.3)
+    loofah (2.0.3)
+      nokogiri (>= 1.5.9)
+    method_source (0.8.2)
+    mini_portile2 (2.0.0)
+    multi_xml (0.5.5)
+    nokogiri (1.6.7.2)
+      mini_portile2 (~> 2.0.0.rc2)
+    pry (0.10.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    pry-rails (0.3.4)
+      pry (>= 0.9.10)
+    rails-html-sanitizer (1.0.3)
+      loofah (~> 2.0)
     rspec (3.0.0)
       rspec-core (~> 3.0.0)
       rspec-expectations (~> 3.0.0)
@@ -14,9 +34,18 @@ GEM
     rspec-mocks (3.0.2)
       rspec-support (~> 3.0.0)
     rspec-support (3.0.2)
+    slop (3.6.0)
+    yandex-translator (0.3.2)
+      httparty (>= 0.13.4)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  pry-rails
+  rails-html-sanitizer
   rspec
+  yandex-translator
+
+BUNDLED WITH
+   1.11.2

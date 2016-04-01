@@ -67,6 +67,16 @@ end
 describe "TranslationKeyGenerator" do
   subject { SlimKeyfy::Slimutils::TranslationKeyGenerator.new(translation).generate_key_name }
 
+  context "with valid translation and html" do
+    let( :translation ) { ":<span>Hello</span> <br/> <strong>'World!~</strong>" }
+    it { should ==  "hello_world_html" }
+  end
+
+  context "with valid czech string" do
+    let( :translation ) { "Ahoj světe" }
+    it { should ==  "hello_world" }
+  end
+
   context "with valid translation and special characters" do
     let( :translation ) { ":Hello 'World!~" }
     it { should ==  "hello_world" }
@@ -82,4 +92,3 @@ describe "TranslationKeyGenerator" do
     it { should == "default_key" }
   end
 end
-
