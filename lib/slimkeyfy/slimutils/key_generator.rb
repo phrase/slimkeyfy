@@ -1,9 +1,11 @@
+require 'yandex-translator'
+
 class SlimKeyfy::Slimutils::BaseKeyGenerator
   def self.generate_key_base_from_path(file_path, file_extension)
     key_name = case file_extension
-      when "slim" then 
-        [subdir_name(file_path), filename(file_path)].join(".") 
-      when "rb" then 
+      when "slim" then
+        [subdir_name(file_path), filename(file_path)].join(".")
+      when "rb" then
         sub = subdir_name(file_path, "controllers")
         fname = filename(file_path)
         if sub != nil and !sub.strip.empty? then
@@ -41,20 +43,27 @@ class SlimKeyfy::Slimutils::TranslationKeyGenerator
 
   def initialize(translation)
     @translation = translation
+    @text_utils = SlimKeyfy::Slimutils::TextUtils.new
+    @translator = Yandex::Translator.new('trnsl.1.1.20150619T111244Z.5b5dcf9dda6502b6.d9759685e888531c571cbd2d2fefa4aa34ca569e')
   end
 
   def generate_key_name
     normalized_translation = ""
     if not (@translation.nil? or @translation.empty?) then
-      normalized_translation = @translation.gsub(VALID, "_").gsub(/[_]+/, "_").downcase
-      normalized_translation = normalized_translation.split("_")[0..3].join("_")
+      truncated_text         = @text_utils.prepare_string(@translation)
+      translated             = @translator.translate truncated_text, from: 'cs', to: 'en'
+      normalized_translation = @text_utils.parameterize(translated, '_')
     end
     return DEFAULT_KEY_NAME if is_not_valid?(normalized_translation.strip)
-    strip_underscores(normalized_translation)
+    add_html_postfix(strip_underscores(normalized_translation))
   end
 
   def is_not_valid?(normalized_translation)
     (normalized_translation.strip == "_" or normalized_translation.empty?)
+  end
+
+  def add_html_postfix(s)
+     @text_utils.is_plain_text?(@translation) ? s : "#{s}_html"
   end
 
   def strip_underscores(s)
@@ -67,4 +76,3 @@ class SlimKeyfy::Slimutils::TranslationKeyGenerator
     s
   end
 end
-

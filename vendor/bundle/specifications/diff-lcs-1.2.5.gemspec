@@ -19,10 +19,10 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT", "Perl Artistic v2", "GNU GPL v2"]
   s.rdoc_options = ["--main", "README.rdoc"]
   s.rubyforge_project = "diff-lcs"
-  s.rubygems_version = "2.2.2"
+  s.rubygems_version = "2.2.3"
   s.summary = "Diff::LCS computes the difference between two Enumerable sequences using the McIlroy-Hunt longest common subsequence (LCS) algorithm"
 
-  s.installed_by_version = "2.2.2" if s.respond_to? :installed_by_version
+  s.installed_by_version = "2.2.3" if s.respond_to? :installed_by_version
 
   if s.respond_to? :specification_version then
     s.specification_version = 4

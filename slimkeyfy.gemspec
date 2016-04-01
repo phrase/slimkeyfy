@@ -18,4 +18,6 @@ Gem::Specification.new do |s|
   s.executables = ["slimkeyfy"]
   s.require_paths = ["lib"]
   s.add_development_dependency('rspec')
+  s.add_dependency('rails-html-sanitizer')
+  s.add_dependency('yandex-translator')
 end
