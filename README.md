@@ -149,11 +149,11 @@ bundle exec rspec spec/
 ```
 PhraseApp Integration
 -
-Now that you processed your views and moved the generated keys to your localization files it is quite easy to push it to PhraseApp. If you have not set up your account yet [take a look here](https://phraseapp.com/docs/about/setup-your-translations-with-phraseapp?language=en). Make sure that the latest gem of PhraseApp is installed by simply typing:
+Now that you processed your views and moved the generated keys to your localization files it is quite easy to push it to PhraseApp. If you have not set up your account yet [take a look here](https://phraseapp.com/). Make sure that the latest gem of PhraseApp is installed by simply typing:
 ```unix
 > gem install phrase
 ```
-If you are already familiar with the PhraseApp gem you can upload your translation/localization files now. For more details on your setup have a look at our [detailed guide](https://phraseapp.com/docs/about/access-your-locale-files-with-the-api-client?language=en).
+If you are already familiar with the PhraseApp gem you can upload your translation/localization files now. For more details on your setup have a look at our [detailed guide](https://phraseapp.com/docs/guides/setup/).
 
 Todo
 -
@@ -175,4 +175,4 @@ References
 * Other tools, not slim specific for this task is the [i15r gem](https://github.com/balinterdi/i15r). It can process .haml and .erb.
 * I strongly recommend checking your translated app with the [i18n-tasks gem](https://github.com/glebm/i18n-tasks). It is a great tool in     finding missing and unused translations.
 * Always consult the [Official Rails Internationalization guide](http://guides.rubyonrails.org/i18n.html) if in doubt.
-* Visit [PhraseApp on Github](https://github.com/phrase/phrase)
+* Visit [PhraseApp on Github](https://github.com/phrase)
