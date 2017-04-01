@@ -27,19 +27,17 @@ class SlimKeyfy::Transformer::Whitespacer
     body = lead ? body.sub("&nbsp;", "") : body
     body = trail ? body.reverse.sub(";psbn&", "").reverse : body
 
-    tag = tag.gsub(tag, "#{tag}#{lead}#{trail}")
+    tag = tag.gsub(tag, "#{tag}#{lead.to_s}#{trail.to_s}")
     [body.gsub("&nbsp;", " "), tag.gsub("=><", "=<>")]
   end
 
   def self.leading_nbsp(body)
     return "<"  if body.start_with?("&nbsp;")
-    ""
   end
 
   def self.trailing_nsbp(body, tag)
-    return "" if tag.start_with?("=>")
+    return if tag.start_with?("=>")
     return ">"  if body.end_with?("&nbsp;")
-    ""
   end
 
   def self.has_equals_tag?(s, html_tag)
