@@ -2,7 +2,7 @@ require 'optparse'
 
 class SlimKeyfy::Console::Commandline
   def initialize(args)
-    @options = {}
+    @options = { translator: {} }
     @args = args
     OptionParser.new(&method(:opt_scan)).parse!(@args)
   end
@@ -24,6 +24,15 @@ class SlimKeyfy::Console::Commandline
   the following options are available:
 
 "
+    opts.on_tail('-k', '--translator-api-key [API_KEY]', 'API key for Yandex Translator') do |value|
+      @options[:translator][:api] = value || ENV['YANDEX_KEY']
+    end
+
+    #
+    opts.on_tail('-f', '--keys-from-locale LOCALE', 'translate from locale') do |from_locale|
+      @options[:translator][:from_locale] = from_locale
+    end
+
     opts.on_tail('-h', '--help', 'Show this message') do
       puts opts
       exit
@@ -49,6 +58,8 @@ class SlimKeyfy::Console::Commandline
     @options[:input] = input = @args.shift
     @options[:locale] = locale = @args.shift
     @options[:yaml_output] = @args.shift
+
+    SlimKeyfy::Slimutils::TranslationKeyGenerator.translator_options = @options[:translator]
 
     wrong_usage if (input.nil? or locale.nil?)
 
