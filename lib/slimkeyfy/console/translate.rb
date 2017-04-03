@@ -8,7 +8,7 @@ class SlimKeyfy::Console::Translate
     @original_file_path = options[:input]
     @no_backup = options.fetch(:no_backup, false)
     @bak_path = SlimKeyfy::Slimutils::MFileUtils.backup(@original_file_path)
-    @content = SlimKeyfy::Slimutils::FileReader.read(@bak_path).split("\n")
+    @content = join_multiline( SlimKeyfy::Slimutils::FileReader.read(@bak_path).split("\n") )
     @file_path = SlimKeyfy::Slimutils::MFileUtils.create_new_file(@original_file_path)
     @key_base = generate_key_base
     @yaml_processor = create_yaml_processor(options)
@@ -97,5 +97,33 @@ class SlimKeyfy::Console::Translate
 
   def comment_tag
     @transformer.slim? ? "//" : "#"
+  end
+
+  def join_multiline( strings_array )
+    result = []
+    joining_str = ''
+    indent_length = 0
+    long_str_start = /^[ ]+\|/
+    long_str_indent = /^[ ]+/
+    strings_array.each do |str|
+      if joining_str.empty?
+        if str[long_str_start]
+          joining_str = str
+          indent_length = str[long_str_start].length
+        else
+          result << str
+        end
+      #multiline string continues
+      elsif str[long_str_indent] && str[long_str_indent].length.to_i >= indent_length
+        joining_str << str.gsub( long_str_indent, ' ' )
+      #multiline string ends
+      else
+        result << joining_str
+        joining_str = ''
+        indent_length = 0
+        redo
+      end
+    end
+    result
   end
 end
