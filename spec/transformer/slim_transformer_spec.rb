@@ -62,6 +62,15 @@ describe "SlimTransformer" do
       }
     end
 
+    # this mean that we are caring only trailing and leading not the internal &nbsp;
+    context "with internal nbsp; and |" do
+      let(:line){ "| Hello&nbsp;World!" }
+      it {should == [
+          "= t('.hello_world')",
+          {"#{key_base}.hello_world" => "Hello World!"}]
+      }
+    end
+
     context "with leading nbsp; and |" do
       let(:line){ "| &nbsp;Hello World!" }
       it {should == [

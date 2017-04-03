@@ -8,7 +8,7 @@ class SlimKeyfy::Console::Translate
     @original_file_path = options[:input]
     @no_backup = options.fetch(:no_backup, false)
     @bak_path = SlimKeyfy::Slimutils::MFileUtils.backup(@original_file_path)
-    @content = join_multiline( SlimKeyfy::Slimutils::FileReader.read(@bak_path).split("\n") )
+    @content = self.class.join_multiline( SlimKeyfy::Slimutils::FileReader.read(@bak_path).split("\n") )
     @file_path = SlimKeyfy::Slimutils::MFileUtils.create_new_file(@original_file_path)
     @key_base = generate_key_base
     @yaml_processor = create_yaml_processor(options)
@@ -99,12 +99,13 @@ class SlimKeyfy::Console::Translate
     @transformer.slim? ? "//" : "#"
   end
 
-  def join_multiline( strings_array )
+  def self.join_multiline( strings_array )
     result = []
     joining_str = ''
     indent_length = 0
     long_str_start = /^[ ]+\|/
     long_str_indent = /^[ ]+/
+    long_str_indent_with_vertical_bar = /^[ ]+\|/
     strings_array.each do |str|
       if joining_str.empty?
         if str[long_str_start]
@@ -113,9 +114,12 @@ class SlimKeyfy::Console::Translate
         else
           result << str
         end
-      #multiline string continues
-      elsif str[long_str_indent] && str[long_str_indent].length.to_i >= indent_length
+      #multiline string continues with spaces
+      elsif ( str[long_str_indent] && str[long_str_indent].length.to_i >= indent_length )
         joining_str << str.gsub( long_str_indent, ' ' )
+      #muliline string continues with spaces and vertical bar with same indentation
+      elsif str[long_str_indent_with_vertical_bar] && str[long_str_indent_with_vertical_bar].length.to_i == indent_length
+        joining_str << str.gsub( long_str_indent_with_vertical_bar, ' ' )
       #multiline string ends
       else
         result << joining_str
