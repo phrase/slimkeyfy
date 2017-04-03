@@ -1,27 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    byebug (9.0.6)
-    coderay (1.1.1)
-    crass (1.0.2)
     diff-lcs (1.2.5)
-    httparty (0.14.0)
-      multi_xml (>= 0.5.2)
-    i18n (0.8.1)
-    method_source (0.8.2)
-    mini_portile2 (2.1.0)
-    multi_xml (0.6.0)
-    nokogiri (1.7.1)
-      mini_portile2 (~> 2.1.0)
-    nokogumbo (1.4.10)
-      nokogiri
-    pry (0.10.4)
-      coderay (~> 1.1.0)
-      method_source (~> 0.8.1)
-      slop (~> 3.4)
-    pry-byebug (3.4.2)
-      byebug (~> 9.0)
-      pry (~> 0.10)
     rspec (3.0.0)
       rspec-core (~> 3.0.0)
       rspec-expectations (~> 3.0.0)
@@ -34,25 +14,12 @@ GEM
     rspec-mocks (3.0.2)
       rspec-support (~> 3.0.0)
     rspec-support (3.0.2)
-    russian (0.6.0)
-      i18n (>= 0.5.0)
-    sanitize (4.4.0)
-      crass (~> 1.0.2)
-      nokogiri (>= 1.4.4)
-      nokogumbo (~> 1.4.1)
-    slop (3.6.0)
-    yandex-translator (0.3.2)
-      httparty (>= 0.13.4)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  pry-byebug
   rspec
-  russian
-  sanitize
-  yandex-translator
 
 RUBY VERSION
    ruby 2.3.3p222
