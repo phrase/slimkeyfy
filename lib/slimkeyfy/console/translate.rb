@@ -125,6 +125,7 @@ class SlimKeyfy::Console::Translate
         result << joining_str
         joining_str = ''
         indent_length = 0
+        result << str
       end
     end
     result << joining_str unless joining_str.empty?
