@@ -24,12 +24,12 @@ class SlimKeyfy::Console::Commandline
   the following options are available:
 
 "
-    opts.on_tail('-k', '--translator-api-key [API_KEY]', 'API key for Yandex Translator') do |value|
-      @options[:translator][:api] = value || ENV['YANDEX_KEY']
+    opts.on_tail('-t', '--translator-api-key [API_KEY]', 'API key for Yandex Translator') do |value|
+      @options[:translator][:api] = value || ENV['YANDEX_TRANSLATOR_API']
     end
 
     #
-    opts.on_tail('-f', '--keys-from-locale LOCALE', 'translate from locale') do |from_locale|
+    opts.on_tail('-l', '--keys-from-locale LOCALE', 'translate keys from locale') do |from_locale|
       @options[:translator][:from_locale] = from_locale
     end
 
