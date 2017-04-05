@@ -24,11 +24,8 @@ class SlimKeyfy::Transformer::Whitespacer
     lead = leading_nbsp(body)
     trail = trailing_nsbp(body, tag)
 
-    stripped_body = lead.nil? ? body : body.sub(/^&nbsp;/, '')
-    stripped_body = trail.nil? ? stripped_body : stripped_body.sub(/&nbsp;$/, '')
-
     tag = tag.gsub(tag, "#{tag}#{lead.to_s}#{trail.to_s}")
-    [stripped_body.gsub("&nbsp;", " "), tag.gsub("=><", "=<>")]
+    [body.sub(/^&nbsp;/, '').sub(/&nbsp;$/, '').gsub("&nbsp;", " "), tag.gsub("=><", "=<>")]
   end
 
   def self.leading_nbsp(body)
