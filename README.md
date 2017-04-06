@@ -1,6 +1,9 @@
 Slimkeyfy
 =
-Extract plain Strings from .slim views and Rails controllers to replace them with I18n's t() method. Keys with it's translations will be streamed to a YAML file.
+Extract plain Strings from .slim views and Rails controllers to replace them with I18n's t() method. 
+Keys with it's translations will be streamed to a YAML file.
+Non english keys get translated with yandex translator gem ( you need to get your api first ). 
+Russian keys get transliterated in case API KEY is missed.
 
 Read more in this blog post: [PhraseApp Blog: Make your Rails App localizable with Slimkeyfy](https://phraseapp.com/blog/posts/slim-localize-your-slim-templates-in-a-second-with-slimkeyfy/)
 
@@ -47,6 +50,28 @@ slimkeyfy INPUT_FILENAME_OR_DIRECTORY LOCALE (e.g. en, fr) [YAML_FILE] [Options]
 - If you do not provide a YAML file - one will be created at configs/locales/view_folder_name.locale.yml
 - If you provide one make sure that the top level locale matches your provided locale
 - The YAML file will be loaded as a hash and deep_merged with the new found translations
+
+I18n for keys addition
+----------------------
+( from alekseyl translator branch: https://github.com/alekseyl/slimkeyfy/tree/translator )
+I18n keys better be in english so if you start I18n from other than en locale you cannot use original slikeyfy approach, you need to translate keys first
+Two options added to CLI: 
+```unix
+  '-t', '--translator-api-key [API_KEY]', 'API key for Yandex Translator'
+  '-l', '--keys-from-locale LOCALE', 'translate keys from locale'  
+```
+
+API key can be given directly in CLI or added with export:
+
+```unix
+   export YANDEX_TRANSLATOR_API="YANDEX_TRANSLATOR_API_KEY"
+```
+
+How to get one:
+Go to https://tech.yandex.com/keys/get/?service=trnsl
+Click on "register an account"
+Fill in the form, with your mobile phone number. Click on send code and Yandex will send you a 4 digit code to your mobile phone. Enter the code from your phone to complete registration. Yandex will then give you an API key
+
 
 **Stream** - walks through the given file/files and if a regex hits you will be prompted to apply (y)es, discard (n)o, tag (x) (comments suggestions above the processed line) or (a)bort (only aborts the current file).
 

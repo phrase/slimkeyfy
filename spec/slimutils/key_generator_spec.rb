@@ -81,5 +81,24 @@ describe "TranslationKeyGenerator" do
     let( :translation ) { "" }
     it { should == "default_key" }
   end
+
+  context "transliteration without api" do
+    let( :translation ) { "Привет" }
+    before { SlimKeyfy::Slimutils::TranslationKeyGenerator.translator_options= { from_locale: :ru } }
+    it { should == "privet" }
+  end
+
+  context "translation key gets default_key if API brokes" do
+    let( :translation ) { "Облом с переводом" }
+    # since locale not ru and translation key is failed than we back to default behaviour
+    it do
+      SlimKeyfy::Slimutils::TranslationKeyGenerator.translator_options= { api: :wrong_key }
+      should == "default_key"
+      SlimKeyfy::Slimutils::TranslationKeyGenerator.translator_options= {}
+    end
+  end
+
+
+
 end
 
