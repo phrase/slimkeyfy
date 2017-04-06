@@ -17,5 +17,10 @@ Gem::Specification.new do |s|
   s.test_files  = s.files.grep(%r{^(spec)/})
   s.executables = ["slimkeyfy"]
   s.require_paths = ["lib"]
+
+  s.add_dependency "yandex-translator"
+  s.add_dependency "russian"
+
   s.add_development_dependency('rspec')
+  s.add_development_dependency('pry-byebug')
 end

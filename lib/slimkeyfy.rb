@@ -1,3 +1,5 @@
+require 'russian'
+require 'yandex-translator'
 
 module SlimKeyfy
   
