@@ -174,11 +174,7 @@ bundle exec rspec spec/
 ```
 Phrase Integration
 -
-Now that you processed your views and moved the generated keys to your localization files it is quite easy to push it to Phrase. If you have not set up your account yet [take a look here](https://phrase.com/). Make sure that the latest gem of Phrase is installed by simply typing:
-```unix
-> gem install phrase
-```
-If you are already familiar with the Phrase gem you can upload your translation/localization files now. For more details on your setup have a look at our [detailed guide](https://phrase.com/docs/guides/setup/).
+Now that you processed your views and moved the generated keys to your localization files it is quite easy to push it to Phrase. If you have not set up your account yet [take a look here](https://phrase.com/). You can use the [Phrase Client](https://github.com/phrase/phraseapp-client) to easily push your translations to Phrase.
 
 Todo
 -
