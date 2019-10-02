@@ -5,7 +5,7 @@ Keys with it's translations will be streamed to a YAML file.
 Non english keys get translated with yandex translator gem ( you need to get your api first ). 
 Russian keys get transliterated in case API KEY is missed.
 
-Read more in this blog post: [PhraseApp Blog: Make your Rails App localizable with Slimkeyfy](https://phraseapp.com/blog/posts/slim-localize-your-slim-templates-in-a-second-with-slimkeyfy/)
+Read more in this blog post: [Phrase Blog: Make your Rails App localizable with Slimkeyfy](https://phrase.com/blog/posts/slim-localize-your-slim-templates-in-a-second-with-slimkeyfy/)
 
 ```ruby
 slimkeyfy app/views/users/show.html.slim en
@@ -172,13 +172,9 @@ To test the application simply call rspec spec/.. from the root directory of sli
 bundle install
 bundle exec rspec spec/
 ```
-PhraseApp Integration
+Phrase Integration
 -
-Now that you processed your views and moved the generated keys to your localization files it is quite easy to push it to PhraseApp. If you have not set up your account yet [take a look here](https://phraseapp.com/). Make sure that the latest gem of PhraseApp is installed by simply typing:
-```unix
-> gem install phrase
-```
-If you are already familiar with the PhraseApp gem you can upload your translation/localization files now. For more details on your setup have a look at our [detailed guide](https://phraseapp.com/docs/guides/setup/).
+Now that you processed your views and moved the generated keys to your localization files it is quite easy to push it to Phrase. If you have not set up your account yet [take a look here](https://phrase.com/). You can use the [Phrase Client](https://github.com/phrase/phraseapp-client) to easily push your translations to Phrase.
 
 Todo
 -
@@ -200,4 +196,4 @@ References
 * Other tools, not slim specific for this task is the [i15r gem](https://github.com/balinterdi/i15r). It can process .haml and .erb.
 * I strongly recommend checking your translated app with the [i18n-tasks gem](https://github.com/glebm/i18n-tasks). It is a great tool in     finding missing and unused translations.
 * Always consult the [Official Rails Internationalization guide](http://guides.rubyonrails.org/i18n.html) if in doubt.
-* Visit [PhraseApp on Github](https://github.com/phrase)
+* Visit [Phrase on Github](https://github.com/phrase)

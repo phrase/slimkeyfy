@@ -256,9 +256,9 @@ describe "SlimTransformer" do
     end
 
     context "when line contains a alt tag" do
-      let( :line ) { "= link_to image_tag(\"application/logo.png\", alt: \"PhraseApp\", height: 21, width: 106), root_path, class: \"navbar-brand\"" }
+      let( :line ) { "= link_to image_tag(\"application/logo.png\", alt: \"Phrase\", height: 21, width: 106), root_path, class: \"navbar-brand\"" }
       let(:translated) { "= link_to image_tag(\"application/logo.png\", alt: t('.phraseapp'), height: 21, width: 106), root_path, class: \"navbar-brand\"" }
-      it { should == [ translated , {"key_base.new.phraseapp" => "PhraseApp"}]}
+      it { should == [ translated , {"key_base.new.phraseapp" => "Phrase"}]}
     end
 
     context "when line contains a include_blank tag" do
