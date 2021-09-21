@@ -197,3 +197,7 @@ References
 * I strongly recommend checking your translated app with the [i18n-tasks gem](https://github.com/glebm/i18n-tasks). It is a great tool in     finding missing and unused translations.
 * Always consult the [Official Rails Internationalization guide](http://guides.rubyonrails.org/i18n.html) if in doubt.
 * Visit [Phrase on Github](https://github.com/phrase)
+
+## Get help / support
+
+Please contact [support@phrase.com](mailto:support@phrase.com?subject=[GitHub]%20) and we can take more direct action toward finding a solution.
