@@ -32,9 +32,9 @@ With Bundler
 ```ruby
 group :development do
   # Github
-  gem 'slimkeyfy', github: 'https://github.com/phrase/slimkeyfy.git'
+  # gem 'slimkeyfy', github: 'phrase/slimkeyfy'
   # or with concrete version
-  gem 'slimkeyfy', '~> 0.X'
+  gem 'slimkeyfy', '~> 0.1'
 end
 ```
 
