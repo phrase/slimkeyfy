@@ -48,24 +48,9 @@ class SlimKeyfy::Slimutils::TranslationKeyGenerator
     @translator_options = new_options
   end
 
-  def self.yt
-    @yt ||= Yandex::Translator.new( translator_options[:api] )
-  end
-
   def self.translate_key(translation)
-    if translator_options[:api] && translation && !translation.empty?
-      begin
-        # language can be detected automatically but this is noticeably slower than providing one.
-        yt.translate( translation, from: translator_options[:from_locale], to: :en )
-      rescue Exception => e
-        p e.inspect
-        return translation
-      end
-    elsif translator_options[:from_locale].to_s == 'ru'
-      ::Russian.transliterate(translation)
-    else
-      translation
-    end
+    translation = DeepL.translate translation, nil, 'EN'
+    translation.text
   end
 
   #instance methods

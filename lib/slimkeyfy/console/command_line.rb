@@ -24,8 +24,14 @@ class SlimKeyfy::Console::Commandline
   the following options are available:
 
 "
-    opts.on_tail('-t', '--translator-api-key [API_KEY]', 'API key for Yandex Translator') do |value|
-      @options[:translator][:api] = value || ENV['YANDEX_TRANSLATOR_API']
+    opts.on_tail('-t', '--translator-api-key [API_KEY]', 'API key for Deepl') do |value|
+      @options[:translator][:api] = value || ENV['DEEPL_AUTH_KEY']
+
+      DeepL.configure do |config|
+        config.auth_key = value
+        config.host = 'https://api-free.deepl.com' 
+        config.version = 'v2'
+      end
     end
 
     #
