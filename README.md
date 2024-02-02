@@ -2,7 +2,7 @@ Slimkeyfy
 =
 Extract plain Strings from .slim views and Rails controllers to replace them with I18n's t() method. 
 Keys with it's translations will be streamed to a YAML file.
-Non english keys get translated with yandex translator gem ( you need to get your api first ). 
+Non english keys get translated with deepl translator gem ( you need to get your api first ). 
 Russian keys get transliterated in case API KEY is missed.
 
 Read more in this blog post: [Phrase Blog: Make your Rails App localizable with Slimkeyfy](https://phrase.com/blog/posts/slim-localize-your-slim-templates-in-a-second-with-slimkeyfy/)
@@ -57,20 +57,19 @@ I18n for keys addition
 I18n keys better be in english so if you start I18n from other than en locale you cannot use original slikeyfy approach, you need to translate keys first
 Two options added to CLI: 
 ```unix
-  '-t', '--translator-api-key [API_KEY]', 'API key for Yandex Translator'
+  '-t', '--translator-api-key [API_KEY]', 'API key for DeepL'
   '-l', '--keys-from-locale LOCALE', 'translate keys from locale'  
 ```
 
 API key can be given directly in CLI or added with export:
 
 ```unix
-   export YANDEX_TRANSLATOR_API="YANDEX_TRANSLATOR_API_KEY"
+   export DEEPL_AUTH_KEY="DEEPL_AUTH_KEY_KEY"
 ```
 
 How to get one:
-Go to https://tech.yandex.com/keys/get/?service=trnsl
-Click on "register an account"
-Fill in the form, with your mobile phone number. Click on send code and Yandex will send you a 4 digit code to your mobile phone. Enter the code from your phone to complete registration. Yandex will then give you an API key
+Go to https://www.deepl.com
+Get an account, check out the free API access (pro version will require Gem changes first - API endpoint for free version is hard coded)
 
 
 **Stream** - walks through the given file/files and if a regex hits you will be prompted to apply (y)es, discard (n)o, tag (x) (comments suggestions above the processed line) or (a)bort (only aborts the current file).
