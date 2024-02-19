@@ -1,5 +1,4 @@
-require 'russian'
-require 'yandex-translator'
+require 'deepl'
 
 module SlimKeyfy
   
@@ -8,6 +7,8 @@ module SlimKeyfy
   end
   
 end
+
+
 
 require 'slimkeyfy/slimutils'
 require 'slimkeyfy/console'
