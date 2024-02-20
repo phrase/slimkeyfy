@@ -1,9 +1,8 @@
 Slimkeyfy
 =
-Extract plain Strings from .slim views and Rails controllers to replace them with I18n's t() method. 
+Extract plain Strings from .slim views and Rails controllers to replace them with I18n's t() method.
 Keys with it's translations will be streamed to a YAML file.
-Non english keys get translated with deepl translator gem ( you need to get your api first ). 
-Russian keys get transliterated in case API KEY is missed.
+Non english keys get translated with deepl translator gem ( you need to get your api first ).
 
 Read more in this blog post: [Phrase Blog: Make your Rails App localizable with Slimkeyfy](https://phrase.com/blog/posts/slim-localize-your-slim-templates-in-a-second-with-slimkeyfy/)
 
@@ -55,10 +54,10 @@ I18n for keys addition
 ----------------------
 ( from alekseyl translator branch: https://github.com/alekseyl/slimkeyfy/tree/translator )
 I18n keys better be in english so if you start I18n from other than en locale you cannot use original slikeyfy approach, you need to translate keys first
-Two options added to CLI: 
+Two options added to CLI:
 ```unix
   '-t', '--translator-api-key [API_KEY]', 'API key for DeepL'
-  '-l', '--keys-from-locale LOCALE', 'translate keys from locale'  
+  '-l', '--keys-from-locale LOCALE', 'translate keys from locale'
 ```
 
 API key can be given directly in CLI or added with export:
